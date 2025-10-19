@@ -1,0 +1,19 @@
+{
+  "name": "genkit-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "genkit start",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@genkit-ai/core": "^1.21.0",
+    "@genkit-ai/dotprompt": "^0.9.12",
+    "@genkit-ai/google-genai": "^1.21.0",
+    "genkit": "^1.21.0"
+  }
+}
