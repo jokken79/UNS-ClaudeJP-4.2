@@ -41,7 +41,10 @@
       "Bash(docker info)",
       "Bash(findstr \"Server Version\")",
       "Bash(git init)",
-      "Bash(git add .)"
+      "Bash(git add .)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit - UNS-ClaudeJP 4.0\n\nSistema completo de gestión de RR.HH. para agencias de personal japonesas.\n\nCaracterísticas principales:\n- Backend: FastAPI + PostgreSQL 15 + SQLAlchemy\n- Frontend: Next.js 15 + TypeScript + Tailwind CSS\n- OCR híbrido: Azure + EasyOCR + Tesseract\n- Docker Compose para orquestación\n- 15 páginas funcionales, 8 módulos core\n- Migración Excel→BD implementada\n\nMigración reciente:\n- Agregados campos: current_status, visa_renewal_alert, visa_alert_days\n- 2 triggers PostgreSQL automáticos\n- Vista vw_employees_with_age\n\nGenerated with Claude Code\nhttps://claude.com/claude-code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git add .claude/settings.local.json)",
+      "Bash(git commit -m \"Update Claude settings\")"
     ],
     "deny": [],
     "ask": []
