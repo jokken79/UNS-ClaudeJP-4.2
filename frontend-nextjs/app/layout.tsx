@@ -59,9 +59,6 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <body className={`${inter.variable} ${notoSansJP.variable} font-sans antialiased`} suppressHydrationWarning>
         <Providers>
-          <div className="absolute top-4 right-4 z-50">
-            <ThemeSwitcher />
-          </div>
           {children}
         </Providers>
       </body>

@@ -50,7 +50,17 @@
       "Bash(timeout 5 curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
       "Bash(git add RESUMEN_FINAL_SESION.md)",
       "Bash(git commit -m \"Add final session summary - System ready for GitHub\")",
-      "Bash(npm install next-themes recharts @tanstack/react-table zustand)"
+      "Bash(npm install next-themes recharts @tanstack/react-table zustand)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd modern DashUI-style dashboard components\n\nImplementación completa de dashboard moderno inspirado en DashUI (CodesCandy):\n\nComponentes Nuevos:\n- Sidebar colapsable con Zustand (persistente)\n- Header con búsqueda, notificaciones y tema\n- MetricCard con animaciones y trends\n- StatsChart con Recharts (3 pestañas)\n- DataTable con TanStack Table y paginación\n\nDependencias:\n- next-themes (tema oscuro/claro)\n- recharts (gráficos interactivos)\n- @tanstack/react-table (tablas avanzadas)\n- zustand (state management)\n\nLayout:\n- Dashboard layout con sidebar + header + footer\n- Responsive design\n- Smooth animations\n\nDocumentación:\n- DASHBOARD_MODERNO_IMPLEMENTACION.md (guía completa)\n\n🎨 Dashboard moderno estilo DashUI listo para usar\n\nGenerated with Claude Code\nhttps://claude.com/claude-code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(timeout 10 curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(timeout 10 curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard)",
+      "Bash(timeout 10 curl -s http://localhost:3000/dashboard)",
+      "Bash(timeout 10 curl -s http://localhost:3000)",
+      "Bash(timeout 10 curl -s http://localhost:3000/)",
+      "Bash(timeout 10 curl -s http://localhost:3000/login)",
+      "Bash(timeout 10 curl -s http://localhost:3000/login -c /tmp/cookies.txt -o /dev/null -w \"%{http_code}\\n\")",
+      "mcp__ide__getDiagnostics",
+      "Bash(timeout 10 curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/demo)"
     ],
     "deny": [],
     "ask": []

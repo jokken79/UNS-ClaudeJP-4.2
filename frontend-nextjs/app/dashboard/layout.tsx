@@ -1,3 +1,5 @@
+'use client';
+
 import { Sidebar } from '@/components/dashboard/sidebar';
 import { Header } from '@/components/dashboard/header';
 
@@ -8,10 +10,10 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex h-screen overflow-hidden bg-muted/10">
-      {/* Sidebar */}
+      {/* Sidebar - no longer fixed, part of flex layout */}
       <Sidebar />
 
-      {/* Main Content Area */}
+      {/* Main Content Area - flex-1 to take remaining space */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <Header />

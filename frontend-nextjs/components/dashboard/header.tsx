@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, Moon, Sun, Bell, LogOut, User, Settings } from 'lucide-react';
+import { Search, Moon, Sun, Bell, LogOut, User, Settings, Menu, LayoutDashboard, Users, Building2, Clock, DollarSign, FileText } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,14 +15,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
-import { useSidebar } from '@/lib/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export function Header() {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
-  const { collapsed } = useSidebar();
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleLogout = () => {
@@ -64,14 +63,42 @@ export function Header() {
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
+  const navItems = [
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/candidates', label: 'Candidatos', icon: Users },
+    { href: '/employees', label: 'Empleados', icon: Users },
+    { href: '/factories', label: 'Fábricas', icon: Building2 },
+    { href: '/timercards', label: 'Asistencia', icon: Clock },
+    { href: '/salary', label: 'Nómina', icon: DollarSign },
+    { href: '/requests', label: 'Solicitudes', icon: FileText },
+  ];
+
   return (
-    <header
-      className={cn(
-        'sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300',
-        collapsed ? 'ml-16' : 'ml-64'
-      )}
-    >
+    <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center gap-4 px-6">
+        {/* MENÚ DE NAVEGACIÓN TEMPORAL */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuLabel>Navegación</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <DropdownMenuItem key={item.href} asChild>
+                  <Link href={item.href} className="flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
         {/* Barra de Búsqueda */}
         <form onSubmit={handleSearch} className="flex-1 max-w-md">
           <div className="relative">
