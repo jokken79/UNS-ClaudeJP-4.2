@@ -14,6 +14,7 @@ export function middleware(request: NextRequest) {
     '/candidates',
     '/employees',
     '/factories',
+    '/timercards',
     '/timer-cards',
     '/salary',
     '/requests',
