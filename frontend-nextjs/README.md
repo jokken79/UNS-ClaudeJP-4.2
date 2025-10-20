@@ -34,3 +34,15 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Proyecto Agente Modular
+
+Este directorio contiene un ejemplo de agente modular para dividir tareas y minimizar el consumo de tokens. Incluye:
+
+- **orquestador.js**: Orquestador principal que decide qué subagente usar.
+- **utils.js**: Funciones de utilidad para preguntar al modelo y ejecutar comandos locales.
+- **subagentes/**: Carpeta con subagentes especializados:
+  - **next.js**: Experto en Next.js y plantillas.
+  - **sql.js**: Experto en PostgreSQL.
+  - **rrhh.js**: Experto en Recursos Humanos en Japón.
+
+Cada subagente contiene plantillas locales y recurre al modelo solo cuando es necesario, siguiendo las leyes y regulaciones japonesas para RRHH.

@@ -9,7 +9,24 @@ echo       UNS-CLAUDEJP 4.0 - INICIAR SISTEMA
 echo ========================================================
 echo.
 
-echo [1/5] Verificando Docker Compose...
+echo [1/6] Verificando archivo .env...
+if not exist .env (
+    echo      .env no encontrado. Generando automaticamente...
+    python generate_env.py
+    if errorlevel 1 (
+        echo.
+        echo PROBLEMA: Error al generar .env
+        echo Por favor, crea manualmente el archivo .env desde .env.example
+        pause
+        exit /b 1
+    )
+    echo      OK - Archivo .env generado.
+) else (
+    echo      OK - Archivo .env ya existe.
+)
+echo.
+
+echo [2/6] Verificando Docker Compose...
 set "DOCKER_COMPOSE_CMD="
 docker compose version >nul 2>&1
 if %errorlevel% EQU 0 (
@@ -29,7 +46,7 @@ if %errorlevel% EQU 0 (
 )
 echo.
 
-echo [2/5] Verificando que Docker Desktop este activo...
+echo [3/6] Verificando que Docker Desktop este activo...
 docker ps >nul 2>&1
 if %errorlevel% NEQ 0 (
     echo ERROR: Docker Desktop no esta corriendo.
@@ -40,12 +57,12 @@ if %errorlevel% NEQ 0 (
 echo      OK - Docker Desktop esta activo.
 echo.
 
-echo [3/5] Deteniendo contenedores anteriores (si existen)...
+echo [4/6] Deteniendo contenedores anteriores (si existen)...
 %DOCKER_COMPOSE_CMD% down >nul 2>&1
 echo      OK - Limpieza completada.
 echo.
 
-echo [4/5] Iniciando servicios...
+echo [5/6] Iniciando servicios...
 echo.
 echo      IMPORTANTE: La base de datos puede tardar 60-90 segundos.
 echo      Esto es NORMAL, especialmente si el sistema se cerro incorrectamente.
@@ -55,14 +72,14 @@ echo      Espera pacientemente...
 echo.
 
 REM Primero iniciar solo la base de datos
-echo      [4.1] Iniciando PostgreSQL primero...
+echo      [5.1] Iniciando PostgreSQL primero...
 %DOCKER_COMPOSE_CMD% up -d db
 
-echo      [4.2] Esperando 30 segundos a que PostgreSQL este saludable...
+echo      [5.2] Esperando 30 segundos a que PostgreSQL este saludable...
 timeout /t 30 /nobreak >nul
 
 REM Verificar que la DB este healthy antes de continuar
-echo      [4.3] Verificando salud de PostgreSQL...
+echo      [5.3] Verificando salud de PostgreSQL...
 docker inspect --format="{{.State.Health.Status}}" uns-claudejp-db 2>nul | findstr "healthy" >nul
 if %errorlevel% NEQ 0 (
     echo      ADVERTENCIA: PostgreSQL aun no esta 'healthy', esperando 30 segundos mas...
@@ -70,7 +87,7 @@ if %errorlevel% NEQ 0 (
 )
 
 REM Ahora iniciar el resto de servicios
-echo      [4.4] Iniciando el resto de servicios...
+echo      [5.4] Iniciando el resto de servicios...
 %DOCKER_COMPOSE_CMD% up -d
 
 if %errorlevel% NEQ 0 (
@@ -89,7 +106,7 @@ if %errorlevel% NEQ 0 (
 echo      OK - Todos los servicios iniciados.
 echo.
 
-echo [5/5] Esperando a que los servicios esten completamente listos...
+echo [6/6] Esperando a que los servicios esten completamente listos...
 echo.
 echo      Esperando 20 segundos adicionales para compilacion de Next.js...
 timeout /t 20 /nobreak >nul

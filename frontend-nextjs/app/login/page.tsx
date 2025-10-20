@@ -70,10 +70,12 @@ export default function LoginPage() {
         <div className="flex justify-center mb-10">
           <div className="relative group">
             <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-purple-600 via-purple-700 to-pink-500 blur-2xl opacity-75 group-hover:opacity-100 transition duration-500" />
-            <div className="relative w-32 h-32 bg-white rounded-full flex items-center justify-center transform transition-all duration-500 hover:scale-110 shadow-2xl">
-              <div className="w-28 h-28 flex items-center justify-center font-bold text-4xl bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-                UNS
-              </div>
+            <div className="relative w-32 h-32 rounded-full flex items-center justify-center transform transition-all duration-500 hover:scale-110 shadow-2xl">
+              <img
+                src="/logo-uns-kikaku.svg"
+                alt="UNS企画 Logo"
+                className="w-32 h-32 rounded-full"
+              />
             </div>
           </div>
         </div>
@@ -81,7 +83,7 @@ export default function LoginPage() {
         {/* Title with Gradient */}
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-200 via-purple-100 to-pink-200 bg-clip-text text-transparent mb-3">
-            UNS-ClaudeJP 3.0
+            UNS-ClaudeJP 4.0
           </h1>
           <p className="text-lg font-medium text-white drop-shadow-lg">
             人材管理インテリジェンスプラットフォーム

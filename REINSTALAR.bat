@@ -26,6 +26,24 @@ if /i NOT "%CONFIRMAR%"=="S" goto :cancelled
 
 :continue
 
+echo.
+echo [0/5] Verificando archivo .env...
+echo.
+if not exist .env (
+    echo      .env no encontrado. Generando automaticamente...
+    python generate_env.py
+    if errorlevel 1 (
+        echo.
+        echo PROBLEMA: Error al generar .env
+        echo Por favor, crea manualmente el archivo .env desde .env.example
+        pause
+        exit /b 1
+    )
+    echo      OK - Archivo .env generado.
+) else (
+    echo      OK - Archivo .env ya existe.
+)
+
 set "DOCKER_COMPOSE_CMD="
 docker compose version >nul 2>&1
 if %errorlevel% EQU 0 (
