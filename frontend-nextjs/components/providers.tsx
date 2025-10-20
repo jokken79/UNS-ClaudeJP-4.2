@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import { themes } from '@/lib/themes';
+import { getCustomThemes } from '@/lib/custom-themes';
 import { ThemeManager } from '@/components/ThemeManager';
 
 // Mapa de migración de nombres de temas antiguos a nuevos
@@ -42,13 +43,24 @@ export function Providers({ children }: { children: React.ReactNode }) {
       })
   );
 
-  // Migrar tema antiguo del localStorage
+  const [allThemes, setAllThemes] = useState<string[]>([]);
+
+  // Load all themes (pre-defined + custom)
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Migrate old theme names
       const oldTheme = localStorage.getItem('theme');
       if (oldTheme && themesMigration[oldTheme]) {
         localStorage.setItem('theme', themesMigration[oldTheme]);
       }
+
+      // Get all theme names
+      const customThemes = getCustomThemes();
+      const allThemeNames = [
+        ...themes.map(t => t.name),
+        ...customThemes.map(t => t.name)
+      ];
+      setAllThemes(allThemeNames);
     }
   }, []);
 
@@ -56,7 +68,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <ThemeProvider
       attribute="class"
       defaultTheme="default-light"
-      themes={themes.map(t => t.name)}
+      themes={allThemes.length > 0 ? allThemes : themes.map(t => t.name)}
       disableTransitionOnChange
     >
       <ThemeManager />

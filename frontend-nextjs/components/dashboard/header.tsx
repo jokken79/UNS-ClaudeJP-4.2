@@ -3,7 +3,7 @@
 import { Search, Bell, LogOut, User, Settings, Menu, LayoutDashboard, Users, Building2, Clock, DollarSign, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { ThemeSelector } from '@/components/theme-selector';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -113,8 +113,8 @@ export function Header() {
 
         {/* Acciones del Header */}
         <div className="flex items-center gap-2">
-          {/* Toggle de Tema */}
-          <ThemeToggle />
+          {/* Selector de Temas */}
+          <ThemeSelector />
 
           {/* Notificaciones */}
           <DropdownMenu>

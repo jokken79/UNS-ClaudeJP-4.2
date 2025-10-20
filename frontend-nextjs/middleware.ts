@@ -20,6 +20,8 @@ export function middleware(request: NextRequest) {
     '/requests',
     '/database',
     '/adminer',
+    '/settings',
+    '/profile',
   ];
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
