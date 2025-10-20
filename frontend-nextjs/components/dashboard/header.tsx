@@ -19,6 +19,9 @@ import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import Link from 'next/link';
 
+const DEFAULT_LIGHT_THEME = 'default-light';
+const DEFAULT_DARK_THEME = 'default-dark';
+
 export function Header() {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
@@ -118,7 +121,19 @@ export function Header() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            onClick={() => {
+              if (theme === DEFAULT_DARK_THEME) {
+                setTheme(DEFAULT_LIGHT_THEME);
+                return;
+              }
+
+              if (theme === DEFAULT_LIGHT_THEME) {
+                setTheme(DEFAULT_DARK_THEME);
+                return;
+              }
+
+              setTheme(DEFAULT_DARK_THEME);
+            }}
             className="h-9 w-9"
           >
             <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
