@@ -114,7 +114,8 @@ export default function EmployeeDetailPage() {
     return new Date(dateString).toLocaleDateString('ja-JP');
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number | null) => {
+    if (amount === null || amount === undefined) return '-';
     return `¥${amount.toLocaleString()}`;
   };
 
