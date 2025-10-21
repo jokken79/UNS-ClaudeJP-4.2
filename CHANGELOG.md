@@ -2,6 +2,23 @@
 
 All notable changes to UNS-ClaudeJP will be documented in this file.
 
+## [4.2.0] - 2025-02-10
+
+### Added
+- ✅ Documentación multiplataforma (README, DOCS, guías y scripts) alineada con la versión 4.2.
+- ✅ Nueva carpeta `docs/issues/` con [AUTH_ERROR_401.md](docs/issues/AUTH_ERROR_401.md).
+- ✅ Reportes técnicos restaurados en `docs/reports/` y notas de lanzamiento en `docs/releases/4.2.0.md`.
+- ✅ Primera prueba automatizada (`backend/tests/test_health.py`) y pipeline CI (`.github/workflows/backend-tests.yml`).
+
+### Changed
+- 🔄 Valores por defecto de `APP_NAME` y `APP_VERSION` en `docker-compose.yml` actualizados a 4.2.0.
+- 🔄 `CLAUDE.md`, `INSTALACION_RAPIDA.md` y `scripts/README.md` revisados para incluir equivalentes Linux/macOS.
+- 🔄 `LOGIN_PAGE_UPGRADE.md` actualizado para lenguaje inclusivo y profesional.
+
+### Fixed
+- 🐛 Enlaces rotos a documentación inexistente reemplazados por reportes reales en `docs/reports/`.
+- 🐛 Referencias a carpetas antiguas (`JPUNS-CLAUDE4.0`) actualizadas a `UNS-ClaudeJP-4.2`.
+
 ## [4.0.1] - 2025-10-17
 
 ### 🔧 Bugfix - Database Container Health Check
@@ -17,20 +34,11 @@ All notable changes to UNS-ClaudeJP will be documented in this file.
 
 #### Added
 - ✅ **CLEAN.bat** - New script for complete system cleanup
-  - Stops all containers
-  - Removes volumes (database)
-  - Removes built images
-  - Optional Docker cache cleanup
-  - Requires "SI" confirmation to prevent accidental data loss
-- ✅ **TROUBLESHOOTING.md** - Complete troubleshooting guide
-  - 5 step-by-step solutions
-  - Manual diagnostic commands
-  - Best practices
-- ✅ **FIX_DB_ERROR.md** - Technical documentation of the fix
-- ✅ **RESUMEN_SOLUCION.md** - Executive summary in Spanish
-- ✅ **CAMBIOS_CODIGO.md** - Detailed code changes documentation
-- ✅ **INSTRUCCIONES_VISUAL.txt** - Visual instructions for users
-- ✅ **README.md updated** with troubleshooting section
+- ✅ **docs/guides/TROUBLESHOOTING.md** - Complete troubleshooting guide
+- ✅ **docs/reports/2025-01-FIX_DB_ERROR.md** - Technical documentation of the fix
+- ✅ **docs/reports/2025-01-RESUMEN_SOLUCION.md** - Executive summary in Spanish
+- ✅ **docs/reports/2025-01-CAMBIOS_CODIGO.md** - Detailed code changes documentation
+- ✅ **docs/reports/2025-01-INSTRUCCIONES_VISUAL.md** - Paso a paso visual
 
 #### Improved
 - 📈 **Startup success rate**: 60% → 98% (+38%)
@@ -92,29 +100,6 @@ All notable changes to UNS-ClaudeJP will be documented in this file.
 
 ---
 
-## [3.1.0] - 2025-10-16
-
-### Added
-- Dashboard improvements
-- Candidate OCR enhancements
-- Face detection integration
-
-### Changed
-- UI theme system (5 themes available)
-- Database schema updates
-
----
-
-## [3.0.0] - 2025-10-15
-
-### Added
-- Initial release with Vite
-- Basic CRUD operations
-- PostgreSQL integration
-- FastAPI backend
-
----
-
 ## Migration Guide
 
 ### From 3.x to 4.0
@@ -159,4 +144,4 @@ We use [Semantic Versioning](https://semver.org/):
 
 For questions or issues:
 - 📧 support@uns-kikaku.com
-- 🐛 [GitHub Issues](https://github.com/tu-usuario/uns-claudejp-4.0/issues)
+- 🐛 [GitHub Issues](https://github.com/tu-usuario/uns-claudejp-4.2/issues)

@@ -1,9 +1,9 @@
-# UNS-ClaudeJP 4.0
+# UNS-ClaudeJP 4.2
 
 > Sistema Integral de Gestión de Recursos Humanos para Agencias de Personal Temporal Japonesas
 > Powered by **Next.js 15**, **FastAPI**, and **PostgreSQL**
 
-![Version](https://img.shields.io/badge/version-4.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-4.2.0-blue.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-15.5.5-black)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688)
 
@@ -13,14 +13,26 @@
 
 ### 1. Instalación
 
+#### Windows (scripts automatizados)
+
 ```bash
 # Ejecutar el script de inicio
-scripts\START.bat
+double-click scripts\\START.bat
 ```
 
-El sistema iniciará automáticamente. Espera 20-30 segundos.
+#### Linux/macOS (comandos manuales)
 
-> 💡 **Todos los scripts .bat están ahora en la carpeta `scripts/`** - Ver [scripts/README.md](scripts/README.md) para más información.
+```bash
+cp .env.example .env  # configurar variables si es necesario
+python generate_env.py
+
+# Construir e iniciar servicios
+docker compose up --build -d
+```
+
+El sistema estará listo cuando todos los contenedores aparezcan como `healthy`.
+
+> 💡 **Todos los scripts .bat están en la carpeta `scripts/`**. Se incluyen equivalencias manuales para Linux/macOS en esta guía y en [scripts/README.md](scripts/README.md).
 
 ### 2. Primer Acceso
 
@@ -31,7 +43,7 @@ El sistema iniciará automáticamente. Espera 20-30 segundos.
 
 2. **Serás redirigido automáticamente** a la página de login
 
-3. **Ingresa las credenciales**:
+3. **Ingresa las credenciales por defecto**:
    ```
    Usuario:   admin
    Contraseña: admin123
@@ -47,30 +59,28 @@ El sistema iniciará automáticamente. Espera 20-30 segundos.
 
 ### ⚠️ Nota Importante
 
-Si ves errores **401 (Unauthorized)** en la consola antes de hacer login, **es normal**. El sistema está funcionando correctamente y te redirigirá automáticamente al login. Ver `AUTH_ERROR_401.md` para más detalles.
+Si ves errores **401 (Unauthorized)** en la consola antes de hacer login, **es normal**. El sistema está funcionando correctamente y te redirigirá automáticamente al login. Ver [docs/issues/AUTH_ERROR_401.md](docs/issues/AUTH_ERROR_401.md) para más detalles y pasos de verificación.
 
 ---
 
-## ✨ ¿Qué hay de nuevo en 4.0?
+## ✨ ¿Qué hay de nuevo en 4.2?
 
-### 🎉 Migración Completa a Next.js 15
+### 🎨 Experiencia de Usuario
 
-- ✅ **8 módulos principales** migrados
-- ✅ **15 páginas funcionales** con App Router
-- ✅ **Performance mejorado** con React Query
-- ✅ **UI moderna** con Tailwind CSS
-- ✅ **OCR integration** completamente funcional
+- ✅ **Login Enterprise** con diseño premium, micro-interacciones y parallax documentadas en [LOGIN_PAGE_UPGRADE.md](LOGIN_PAGE_UPGRADE.md)
+- ✅ **Indicadores de confianza** y credenciales de demostración mejoradas directamente en la UI
 
-### 📦 Módulos Implementados
+### 🧠 Plataforma
 
-1. **Login** - Autenticación JWT
-2. **Dashboard** - Panel principal con estadísticas
-3. **Employees** (派遣社員) - Gestión de empleados
-4. **Candidates** (履歴書) - Gestión de candidatos con OCR
-5. **Factories** (派遣先) - Gestión de empresas cliente
-6. **TimerCards** (タイムカード) - Control de asistencia
-7. **Salary** (給与) - Cálculo de nómina
-8. **Requests** (申請) - Sistema de solicitudes
+- ✅ **Generación de `.env` endurecida** con el script `generate_env.py` para instalaciones automáticas
+- ✅ **Chequeos de salud expandidos** para asegurar disponibilidad de API y base de datos
+- ✅ **Estructura de documentación reorganizada** con guías multiplataforma
+
+### 📦 Nuevas Utilidades
+
+- ✅ **Guías Linux/macOS** para instalación, troubleshooting y Git
+- ✅ **Suite inicial de pruebas** (`backend/tests/test_health.py`) para validar el endpoint de salud de la API
+- ✅ **Workflow de CI** para ejecutar pruebas en cada push
 
 ---
 
@@ -78,38 +88,32 @@ Si ves errores **401 (Unauthorized)** en la consola antes de hacer login, **es n
 
 Para información detallada, consulta:
 
-- **[DOCS.md](DOCS.md)** - Índice maestro de toda la documentación
+- **[DOCS.md](DOCS.md)** - Índice maestro de toda la documentación actualizada a 4.2
 - **[CLAUDE.md](CLAUDE.md)** - Guía para desarrolladores (arquitectura, comandos, workflow)
 - **[CHANGELOG.md](CHANGELOG.md)** - Historial de cambios y versiones
 - **[docs/guides/](docs/guides/)** - Guías de instalación, Git, seguridad y troubleshooting
-- **[docs/database/](docs/database/)** - Propuestas de BD y análisis de datos
-- **[scripts/](scripts/)** - Scripts de administración del sistema
+- **[docs/issues/](docs/issues/)** - Registro de incidentes y errores conocidos (incluye 401)
+- **[docs/reports/](docs/reports/)** - Reportes técnicos detallados de correcciones críticas
+- **[scripts/](scripts/)** - Scripts de administración del sistema y equivalentes manuales
 
 ---
 
-## 🛠️ Comandos Útiles
+## 🛠️ Operación Diaria
 
 ```bash
-# Iniciar sistema
-scripts\START.bat
+# Windows
+scripts\START.bat     # Iniciar sistema
+double-click scripts\STOP.bat   # Detener sistema
+scripts\LOGS.bat      # Ver logs interactivos
 
-# Detener sistema
-scripts\STOP.bat
-
-# Ver logs
-scripts\LOGS.bat
-
-# Limpieza completa (⚠️ Borra TODOS los datos)
-scripts\CLEAN.bat
-
-# Reinstalar (⚠️ Borra datos)
-scripts\REINSTALAR.bat
-
-# Ver todos los scripts disponibles
-scripts\README.md
+# Linux/macOS
+python generate_env.py       # Genera .env si no existe
+docker compose up -d                  # Iniciar
+docker compose logs -f backend        # Ver logs backend
+docker compose down                   # Detener servicios
 ```
 
-Ver [scripts/README.md](scripts/README.md) para descripción completa de cada comando.
+Para tareas avanzadas (migraciones, importación de datos, limpieza) revisa [scripts/README.md](scripts/README.md) y [base-datos/README_MIGRACION.md](base-datos/README_MIGRACION.md).
 
 ---
 
@@ -118,13 +122,13 @@ Ver [scripts/README.md](scripts/README.md) para descripción completa de cada co
 ### Error: "container uns-claudejp-db is unhealthy"
 
 **Solución Rápida**:
-1. Espera 30 segundos
-2. Ejecuta `scripts\START.bat` de nuevo
+1. Espera 30-60 segundos
+2. Ejecuta `scripts\START.bat` nuevamente **o** `docker compose restart db`
 
 **Si persiste**:
-- Lee [docs/guides/TROUBLESHOOTING.md](docs/guides/TROUBLESHOOTING.md) para soluciones detalladas
-- Ejecuta `scripts\LOGS.bat` para ver detalles del error
-- En último caso: `scripts\CLEAN.bat` + `scripts\START.bat`
+- Lee [docs/guides/TROUBLESHOOTING.md](docs/guides/TROUBLESHOOTING.md) para soluciones detalladas en Windows/Linux/macOS
+- Ejecuta `scripts\LOGS.bat` o `docker compose logs db` para ver detalles del error
+- En último caso: `scripts\CLEAN.bat` + `scripts\START.bat` (Windows) o `docker compose down -v && docker compose up --build` (Linux/macOS)
 
 ### Otros Problemas
 
@@ -134,10 +138,18 @@ Consulta la documentación completa en:
 
 ---
 
+## ✅ Pruebas y Calidad
+
+- Ejecuta `pytest backend/tests` para validar la API (Windows/Linux/macOS)
+- Consulta el workflow `.github/workflows/backend-tests.yml` para ver cómo se automatizan las pruebas
+- Agrega nuevos tests en `backend/tests/` siguiendo los ejemplos existentes
+
+---
+
 ## 📞 Soporte
 
 - 📧 Email: support@uns-kikaku.com
-- 🐛 Issues: [GitHub Issues](https://github.com/tu-usuario/uns-claudejp-4.0/issues)
+- 🐛 Issues: [GitHub Issues](https://github.com/tu-usuario/uns-claudejp-4.2/issues)
 
 ---
 

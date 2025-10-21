@@ -107,3 +107,7 @@ test_*.py
 *_test.py
 *.json.result
 ocr_rirekisho_results.json
+
+# Allow tracked backend tests
+!backend/tests/
+!backend/tests/test_*.py

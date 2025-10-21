@@ -1,6 +1,6 @@
-# 📚 Índice Maestro de Documentación - UNS-ClaudeJP 4.0
+# 📚 Índice Maestro de Documentación - UNS-ClaudeJP 4.2
 
-> Guía completa para encontrar toda la documentación del proyecto organizada por categorías
+> Guía completa para encontrar toda la documentación del proyecto organizada por categorías.
 
 ---
 
@@ -8,9 +8,9 @@
 
 | Documento | Descripción |
 |-----------|-------------|
-| [README.md](README.md) | Inicio rápido del sistema y guía básica |
-| [docs/guides/INSTALACION_RAPIDA.md](docs/guides/INSTALACION_RAPIDA.md) | Guía paso a paso de instalación |
-| [scripts/README.md](scripts/README.md) | Descripción de todos los scripts disponibles |
+| [README.md](README.md) | Inicio rápido del sistema y guía multiplataforma |
+| [docs/guides/INSTALACION_RAPIDA.md](docs/guides/INSTALACION_RAPIDA.md) | Guía paso a paso de instalación en Windows, Linux y macOS |
+| [scripts/README.md](scripts/README.md) | Descripción de scripts y comandos equivalentes |
 
 ---
 
@@ -18,9 +18,10 @@
 
 | Documento | Descripción |
 |-----------|-------------|
-| [CLAUDE.md](CLAUDE.md) | **Guía principal** - Arquitectura, comandos, desarrollo, workflows |
+| [CLAUDE.md](CLAUDE.md) | **Guía principal** - Arquitectura, comandos, workflows |
 | [CHANGELOG.md](CHANGELOG.md) | Historial de cambios y versiones |
-| [.claude/CLAUDE.md](.claude/CLAUDE.md) | Instrucciones específicas para Claude Code AI |
+| [.claude/CLAUDE.md](.claude/CLAUDE.md) | Flujo histórico de orquestación (ver nota de vigencia) |
+| [docs/releases/4.2.0.md](docs/releases/4.2.0.md) | Notas de lanzamiento detalladas de la versión 4.2 |
 
 ---
 
@@ -35,7 +36,7 @@
 | [BD_PROPUESTA_3_HIBRIDA.md](docs/database/BD_PROPUESTA_3_HIBRIDA.md) | ✅ Propuesta híbrida (implementada) |
 | [ANALISIS_EXCEL_VS_BD.md](docs/database/ANALISIS_EXCEL_VS_BD.md) | Análisis comparativo Excel vs Base de Datos |
 | [RESUMEN_ANALISIS_EXCEL_COMPLETO.md](docs/database/RESUMEN_ANALISIS_EXCEL_COMPLETO.md) | Resumen completo del análisis de Excel |
-| [base-datos/README_MIGRACION.md](base-datos/README_MIGRACION.md) | Guía de migraciones con Alembic |
+| [base-datos/README_MIGRACION.md](base-datos/README_MIGRACION.md) | Guía de migraciones con Alembic (multiplataforma) |
 
 ---
 
@@ -47,16 +48,31 @@
 
 | Documento | Descripción |
 |-----------|-------------|
-| [INSTALACION_RAPIDA.md](docs/guides/INSTALACION_RAPIDA.md) | Guía rápida de instalación |
-| [TROUBLESHOOTING.md](docs/guides/TROUBLESHOOTING.md) | Solución de problemas comunes |
+| [INSTALACION_RAPIDA.md](docs/guides/INSTALACION_RAPIDA.md) | Guía rápida de instalación (Windows/Linux/macOS) |
+| [TROUBLESHOOTING.md](docs/guides/TROUBLESHOOTING.md) | Solución de problemas comunes por plataforma |
 
 ### Git y GitHub
 
 | Documento | Descripción |
 |-----------|-------------|
 | [INSTRUCCIONES_GIT.md](docs/guides/INSTRUCCIONES_GIT.md) | Comandos Git básicos y workflow |
-| [COMO_SUBIR_A_GITHUB.md](docs/guides/COMO_SUBIR_A_GITHUB.md) | Cómo subir cambios a GitHub |
+| [COMO_SUBIR_A_GITHUB.md](docs/guides/COMO_SUBIR_A_GITHUB.md) | Cómo subir cambios a GitHub de forma segura |
 | [SEGURIDAD_GITHUB.md](docs/guides/SEGURIDAD_GITHUB.md) | Buenas prácticas de seguridad en GitHub |
+
+---
+
+## ⚠️ Incidentes y Reportes
+
+📁 **Ubicación**: `docs/issues/` y `docs/reports/`
+
+| Documento | Descripción |
+|-----------|-------------|
+| [issues/AUTH_ERROR_401.md](docs/issues/AUTH_ERROR_401.md) | Explicación del error 401 antes del login |
+| [reports/2024-11-Backend-Hardening.md](docs/reports/2024-11-Backend-Hardening.md) | Checklist de endurecimiento del backend |
+| [reports/2025-01-FIX_DB_ERROR.md](docs/reports/2025-01-FIX_DB_ERROR.md) | Detalles técnicos del fix al healthcheck de PostgreSQL |
+| [reports/2025-01-RESUMEN_SOLUCION.md](docs/reports/2025-01-RESUMEN_SOLUCION.md) | Resumen ejecutivo de la solución |
+| [reports/2025-01-CAMBIOS_CODIGO.md](docs/reports/2025-01-CAMBIOS_CODIGO.md) | Cambios de código involucrados |
+| [reports/2025-01-INSTRUCCIONES_VISUAL.md](docs/reports/2025-01-INSTRUCCIONES_VISUAL.md) | Pasos visuales de verificación |
 
 ---
 
@@ -91,18 +107,27 @@
 
 | Script | Descripción |
 |--------|-------------|
-| [START.bat](scripts/START.bat) | Iniciar todos los servicios Docker |
-| [STOP.bat](scripts/STOP.bat) | Detener todos los servicios |
-| [LOGS.bat](scripts/LOGS.bat) | Ver logs de servicios |
+| [START.bat](scripts/START.bat) | Iniciar todos los servicios Docker (Windows) |
+| [STOP.bat](scripts/STOP.bat) | Detener todos los servicios (Windows) |
+| [LOGS.bat](scripts/LOGS.bat) | Ver logs de servicios (Windows) |
 | [REINSTALAR.bat](scripts/REINSTALAR.bat) | Reinstalación completa (⚠️ borra datos) |
 | [CLEAN.bat](scripts/CLEAN.bat) | Limpieza completa del sistema |
 | [INSTALAR.bat](scripts/INSTALAR.bat) | Instalación inicial |
 | [DIAGNOSTICO.bat](scripts/DIAGNOSTICO.bat) | Diagnóstico del sistema |
 | [LIMPIAR_CACHE.bat](scripts/LIMPIAR_CACHE.bat) | Limpiar caché de Docker |
-| [GIT_SUBIR.bat](scripts/GIT_SUBIR.bat) | Subir cambios a GitHub |
-| [GIT_BAJAR.bat](scripts/GIT_BAJAR.bat) | Bajar cambios desde GitHub |
+| Equivalentes Linux/macOS | Ver secciones dedicadas en cada guía |
 
-Ver [scripts/README.md](scripts/README.md) para detalles completos.
+---
+
+## 🧪 Pruebas Automatizadas
+
+📁 **Ubicación**: `backend/tests/`
+
+| Archivo | Descripción |
+|---------|-------------|
+| [test_health.py](backend/tests/test_health.py) | Verifica que el endpoint `/api/health` responda correctamente |
+
+Workflow asociado: `.github/workflows/backend-tests.yml`.
 
 ---
 
@@ -115,36 +140,31 @@ UNS-ClaudeJP-4.2/
 ├── CLAUDE.md                     # Guía principal para desarrolladores
 ├── CHANGELOG.md                  # Historial de cambios
 │
-├── scripts/                      # 🛠️ Scripts de administración
+├── scripts/                      # 🛠️ Scripts de administración (Windows)
 │   ├── README.md                 # Descripción de scripts
-│   ├── START.bat                 # Iniciar sistema
-│   ├── STOP.bat                  # Detener sistema
-│   └── ...                       # Otros scripts
+│   └── *.bat                     # Scripts automatizados
 │
 ├── docs/                         # 📚 Documentación organizada
 │   ├── database/                 # Base de datos
-│   │   ├── BD_PROPUESTA_*.md
-│   │   └── ANALISIS_*.md
 │   ├── guides/                   # Guías y tutoriales
-│   │   ├── INSTALACION_RAPIDA.md
-│   │   ├── TROUBLESHOOTING.md
-│   │   └── *_GIT.md
+│   ├── issues/                   # Incidentes y errores conocidos
+│   ├── reports/                  # Reportes técnicos y resúmenes
+│   ├── releases/                 # Notas por versión
 │   ├── sessions/                 # Resúmenes de sesiones
-│   │   └── RESUMEN_*.md
 │   └── archive/                  # Documentos históricos
-│       └── *_COMPLETADOS.md
 │
 ├── backend/                      # Backend FastAPI
 │   ├── app/
 │   ├── alembic/
-│   └── scripts/
+│   ├── scripts/
+│   └── tests/
 │
 ├── frontend-nextjs/              # Frontend Next.js 15
 │   ├── app/
 │   ├── components/
-│   └── lib/
+│   └── README.md
 │
-└── base-datos/                   # Archivos de base de datos
+└── base-datos/                   # Migraciones manuales y guías
     └── README_MIGRACION.md
 ```
 
@@ -156,7 +176,7 @@ UNS-ClaudeJP-4.2/
 → [docs/guides/INSTALACION_RAPIDA.md](docs/guides/INSTALACION_RAPIDA.md)
 
 ### ¿Cómo ejecutar el sistema?
-→ [README.md](README.md) o `scripts\START.bat`
+→ [README.md](README.md) o `docker compose up -d`
 
 ### ¿Problemas al iniciar?
 → [docs/guides/TROUBLESHOOTING.md](docs/guides/TROUBLESHOOTING.md)
@@ -188,27 +208,17 @@ UNS-ClaudeJP-4.2/
 ### Soy desarrollador
 1. Lee [CLAUDE.md](CLAUDE.md) completamente
 2. Revisa [docs/database/](docs/database/) para entender el esquema
-3. Consulta [scripts/README.md](scripts/README.md) para comandos de desarrollo
+3. Consulta [backend/README.md](backend/README.md) y [frontend-nextjs/README.md](frontend-nextjs/README.md) para comandos específicos
 
 ### Tengo un problema
 1. Consulta [docs/guides/TROUBLESHOOTING.md](docs/guides/TROUBLESHOOTING.md)
-2. Ejecuta `scripts\DIAGNOSTICO.bat`
-3. Revisa logs con `scripts\LOGS.bat`
+2. Ejecuta `scripts\DIAGNOSTICO.bat` o `docker compose ps`
+3. Revisa logs con `scripts\LOGS.bat` o `docker compose logs -f backend`
 
 ### Quiero subir cambios a GitHub
 1. Lee [docs/guides/INSTRUCCIONES_GIT.md](docs/guides/INSTRUCCIONES_GIT.md)
-2. Usa `scripts\GIT_SUBIR.bat`
-3. Consulta [docs/guides/SEGURIDAD_GITHUB.md](docs/guides/SEGURIDAD_GITHUB.md)
+2. Usa `scripts\GIT_SUBIR.bat` o los comandos manuales documentados
 
 ---
 
-## 📞 Soporte
-
-- 📧 Email: support@uns-kikaku.com
-- 🐛 Issues: [GitHub Issues](https://github.com/jokken79/UNS-ClaudeJP-4.2/issues)
-
----
-
-<p align="center">
-  <strong>UNS-ClaudeJP 4.0</strong> | Made with ❤️ by UNS-Kikaku | Powered by Claude AI
-</p>
+**Última actualización:** 2025-02-10

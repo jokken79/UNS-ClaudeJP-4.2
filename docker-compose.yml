@@ -42,8 +42,8 @@ services:
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-480}
       
       # Application
-      APP_NAME: ${APP_NAME:-UNS-ClaudeJP 4.0}
-      APP_VERSION: ${APP_VERSION:-4.0.0}
+      APP_NAME: ${APP_NAME:-UNS-ClaudeJP 4.2}
+      APP_VERSION: -e
       ENVIRONMENT: ${ENVIRONMENT:-development}
       DEBUG: ${DEBUG:-true}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
@@ -85,8 +85,8 @@ services:
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-480}
 
       # Application
-      APP_NAME: ${APP_NAME:-UNS-ClaudeJP 4.0}
-      APP_VERSION: ${APP_VERSION:-4.0.0}
+      APP_NAME: ${APP_NAME:-UNS-ClaudeJP 4.2}
+      APP_VERSION: -e
       ENVIRONMENT: ${ENVIRONMENT:-development}
       DEBUG: ${DEBUG:-true}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
@@ -153,8 +153,8 @@ services:
     restart: always
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
-      NEXT_PUBLIC_APP_VERSION: 4.0.0
-      NEXT_PUBLIC_APP_NAME: UNS-ClaudeJP 4.0
+      NEXT_PUBLIC_APP_VERSION: 4.2.0
+      NEXT_PUBLIC_APP_NAME: UNS-ClaudeJP 4.2
       NODE_ENV: development
     volumes:
       - ./frontend-nextjs:/app
