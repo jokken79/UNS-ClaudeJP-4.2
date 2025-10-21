@@ -109,7 +109,7 @@ The login page has been completely redesigned with a premium, enterprise-grade a
 4. **Shimmer Button**: Login button with sweeping shine effect
 5. **Trust Indicators**: Enhanced badges with colored icons
 6. **Responsive**: Works on mobile (uses long logo, single column)
-7. **Professional**: Blue/indigo color scheme (no more "gay pride" colors)
+7. **Professional**: Blue/indigo color scheme alineado con lineamientos corporativos
 
 ## Testing
 

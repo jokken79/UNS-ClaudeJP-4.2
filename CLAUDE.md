@@ -1,6 +1,8 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> ℹ️ **Nota**: El flujo automatizado descrito en `.claude/CLAUDE.md` se conserva como referencia histórica. No es obligatorio para colaboradores humanos; usa las guías de este archivo como fuente de verdad.
+
 
 ## 🚨 NORMA #7 - GESTIÓN DE ARCHIVOS .md (OBLIGATORIA PARA TODOS LOS AGENTES)
 
@@ -23,36 +25,46 @@ Solo crear nuevo .md si el tema es **completamente diferente** y no encaja en ex
 
 ## Project Overview
 
-UNS-ClaudeJP 4.0 is a comprehensive HR management system for Japanese staffing agencies (人材派遣会社), built with:
+UNS-ClaudeJP 4.2 is a comprehensive HR management system for Japanese staffing agencies (人材派遣会社), built with:
 - **Backend**: FastAPI 0.115.6 (Python 3.11+) with SQLAlchemy 2.0.36 ORM and PostgreSQL 15
 - **Frontend**: Next.js 15.5.5 with TypeScript 5.6 and Tailwind CSS 3.4 (App Router)
 - **DevOps**: Docker Compose for orchestration
 
 The system manages the complete lifecycle of temporary workers: candidates (履歴書/Rirekisho), employees (派遣社員), factories (派遣先), attendance (タイムカード), payroll (給与), and requests (申請). It includes hybrid OCR processing (Azure + EasyOCR + Tesseract) for Japanese document handling.
 
-**Version 4.0** represents a major upgrade from v3.x with migration from React/Vite to Next.js 15, implementing 15 functional pages across 8 core modules.
+**Version 4.2** represents a major upgrade from v3.x with migration from React/Vite to Next.js 15, implementing 15 functional pages across 8 core modules.
 
 ## Quick Start Commands
 
-```bash
-# Start all services (DB, Backend, Frontend)
-scripts\START.bat
-# Services available at:
-# - Frontend: http://localhost:3000
-# - API Docs: http://localhost:8000/api/docs
-# - Adminer: http://localhost:8080
+### Windows (scripts automatizados)
 
-# Stop all services
+```bash
+# Iniciar servicios
+scripts\START.bat
+
+# Detener
 scripts\STOP.bat
 
-# View logs
+# Ver logs
 scripts\LOGS.bat
 
-# Reset database (WARNING: destroys all data)
+# Reinicializar (⚠️ borra datos)
 scripts\REINSTALAR.bat
 ```
 
-> 💡 All batch scripts are located in the `scripts/` folder. See [scripts/README.md](scripts/README.md) for detailed descriptions.
+### Linux/macOS (comandos manuales)
+
+```bash
+python generate_env.py
+# Iniciar servicios
+docker compose up -d
+# Ver logs
+docker compose logs -f backend
+# Detener servicios
+docker compose down
+```
+
+> 💡 Todos los scripts .bat están en `scripts/`. Revisa [scripts/README.md](scripts/README.md) para equivalentes manuales.
 
 Default credentials: `admin` / `admin123`
 

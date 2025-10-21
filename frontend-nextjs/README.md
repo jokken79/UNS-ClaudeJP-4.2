@@ -1,48 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend Next.js 15 - UNS-ClaudeJP 4.2
 
-## Getting Started
-
-First, run the development server:
+## 🚀 Scripts principales
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install          # Instala dependencias
+npm run dev          # Desarrollo (http://localhost:3000)
+npm run lint         # Linter
+npm run build        # Build producción
+npm run start        # Servir build en producción
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+En Docker estos comandos se ejecutan automáticamente al levantar `docker compose up -d`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🔑 Variables de entorno
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `NEXT_PUBLIC_API_URL` (por defecto `http://localhost:8000`)
+- `NEXT_PUBLIC_APP_NAME` (muestra "UNS-ClaudeJP 4.2")
+- `NEXT_PUBLIC_APP_VERSION`
 
-## Learn More
+Configura valores adicionales en `.env.local` si desarrollas fuera de Docker.
 
-To learn more about Next.js, take a look at the following resources:
+## 🧩 Estructura relevante
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+frontend-nextjs/
+├── app/              # Rutas App Router
+├── components/       # Componentes reutilizables
+├── lib/              # Utilidades y clientes
+└── public/           # Recursos estáticos (logos)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+La página de login (`app/login/page.tsx`) contiene el diseño enterprise descrito en [LOGIN_PAGE_UPGRADE.md](../LOGIN_PAGE_UPGRADE.md).
 
-## Deploy on Vercel
+## 🧪 Pruebas y QA
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Se recomienda configurar `npm run test` o Playwright para validaciones UI. Por ahora la verificación se realiza mediante `npm run lint` y pruebas manuales. Documenta nuevos comandos en este archivo.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# Proyecto Agente Modular
+## 🔄 Integración con backend
 
-Este directorio contiene un ejemplo de agente modular para dividir tareas y minimizar el consumo de tokens. Incluye:
+El frontend consume la API FastAPI protegida por JWT. Asegúrate de que `NEXT_PUBLIC_API_URL` coincida con la URL del backend y que CORS esté configurado en `FRONTEND_URL`.
 
-- **orquestador.js**: Orquestador principal que decide qué subagente usar.
-- **utils.js**: Funciones de utilidad para preguntar al modelo y ejecutar comandos locales.
-- **subagentes/**: Carpeta con subagentes especializados:
-  - **next.js**: Experto en Next.js y plantillas.
-  - **sql.js**: Experto en PostgreSQL.
-  - **rrhh.js**: Experto en Recursos Humanos en Japón.
+---
 
-Cada subagente contiene plantillas locales y recurre al modelo solo cuando es necesario, siguiendo las leyes y regulaciones japonesas para RRHH.
+**Última actualización:** 2025-02-10

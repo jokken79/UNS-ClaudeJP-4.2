@@ -1,11 +1,17 @@
-# Instalación Rápida - UNS-ClaudeJP 4.0
+# Instalación Rápida - UNS-ClaudeJP 4.2
 
 ## Requisitos Previos
 
+### Windows
 - **Windows 10/11**
 - **Docker Desktop** instalado y ejecutándose
-- **Python 3.8+** instalado (viene con Windows 10/11)
+- **Python 3.10+** (incluido en scripts)
 - **Git** (opcional, para clonar el repositorio)
+
+### Linux / macOS
+- **Docker Engine + Docker Compose v2**
+- **Python 3.10+**
+- **Git**
 
 ## Instalación en 3 Pasos
 
@@ -13,136 +19,104 @@
 
 ```bash
 git clone <tu-repositorio-url>
-cd JPUNS-CLAUDE4.0
+cd UNS-ClaudeJP-4.2
 ```
 
-O descarga el ZIP y descomprímelo.
-
-### 2. Ejecutar REINSTALAR.bat
+### 2. Configurar variables de entorno
 
 ```bash
-scripts\REINSTALAR.bat
+cp .env.example .env
+python generate_env.py
 ```
 
-Este script automáticamente:
-- ✅ Genera el archivo `.env` con credenciales seguras (si no existe)
-- ✅ Construye las imágenes Docker
-- ✅ Inicia PostgreSQL
-- ✅ Ejecuta migraciones de base de datos
-- ✅ Importa datos de prueba
-- ✅ Inicia Backend (FastAPI)
-- ✅ Inicia Frontend (Next.js)
+> 💡 En Windows, los scripts `.bat` ejecutan este paso automáticamente.
 
-**Tiempo estimado:** 5-8 minutos
+### 3. Iniciar servicios
 
-### 3. Acceder al Sistema
+| Plataforma | Comando |
+|------------|---------|
+| Windows | `scripts\START.bat` |
+| Linux/macOS | `docker compose up --build -d` |
 
-Una vez completada la instalación:
+**Qué hace el arranque:**
+- Construye imágenes Docker
+- Ejecuta migraciones Alembic
+- Crea el usuario administrador (admin/admin123)
+- Importa datos de ejemplo
 
-- **Frontend:** http://localhost:3000
-- **API Docs:** http://localhost:8000/api/docs
-- **Adminer (BD):** http://localhost:8080
-
-**Credenciales por defecto:**
-- Usuario: `admin`
-- Contraseña: `admin123`
+**Tiempo estimado:** 5-8 minutos en la primera ejecución.
 
 ## Uso Diario
 
-### Iniciar el Sistema
-
-```bash
-scripts\START.bat
-```
-
-### Detener el Sistema
-
-```bash
-scripts\STOP.bat
-```
-
-### Ver Logs
-
-```bash
-scripts\LOGS.bat
-```
+| Acción | Windows | Linux/macOS |
+|--------|---------|-------------|
+| Iniciar | `scripts\START.bat` | `docker compose up -d` |
+| Detener | `scripts\STOP.bat` | `docker compose down` |
+| Ver logs | `scripts\LOGS.bat` | `docker compose logs -f backend` |
+| Reinstalar (⚠️ borra datos) | `scripts\REINSTALAR.bat` | `docker compose down -v && docker compose up --build` |
 
 ## Solución de Problemas
 
 ### Problema: "PostgreSQL is unhealthy"
 
-**Solución:**
-1. Espera 60-90 segundos (es normal en el primer arranque)
-2. Si persiste, ejecuta:
-   ```bash
-   scripts\STOP.bat
-   scripts\REINSTALAR.bat
-   ```
+1. Espera 60 segundos y reintenta (`scripts\START.bat` o `docker compose restart db`).
+2. Si persiste, consulta [docs/guides/TROUBLESHOOTING.md](TROUBLESHOOTING.md) para seguir los pasos por plataforma.
 
-### Problema: "Error al generar .env"
+### Problema: `.env` no generado
 
-**Solución:**
-1. Verifica que Python esté instalado: `python --version`
-2. Crea manualmente el archivo `.env` desde `.env.example`:
-   ```bash
-   copy .env.example .env
-   ```
-3. Edita `.env` y cambia:
-   - `POSTGRES_PASSWORD` → Una contraseña segura
-   - `SECRET_KEY` → Una clave aleatoria de 64 caracteres
+```bash
+python --version
+cp .env.example .env
+python generate_env.py
+```
 
-### Problema: "Puerto 3000/8000 ya en uso"
+En Windows también puedes ejecutar `scripts\INSTALAR.bat`.
 
-**Solución:**
-1. Cierra la aplicación que esté usando el puerto
-2. O cambia el puerto en `docker-compose.yml`
+### Problema: Puerto 3000/8000 ocupado
+
+- Cierra la aplicación que usa el puerto.
+- Cambia los puertos en `docker-compose.yml` y reinicia los servicios.
 
 ## Archivos Importantes
 
 | Archivo | Descripción |
 |---------|-------------|
-| `scripts/START.bat` | Inicia el sistema |
-| `scripts/STOP.bat` | Detiene el sistema |
-| `scripts/REINSTALAR.bat` | Reinstala desde cero |
-| `scripts/LOGS.bat` | Muestra logs en tiempo real |
-| `scripts/README.md` | Descripción de todos los scripts |
-| `generate_env.py` | Genera `.env` automáticamente |
-| `.env` | Configuración (NO commitear a Git) |
-| `.env.example` | Plantilla de configuración |
+| `scripts/START.bat` | Inicia el sistema (Windows) |
+| `scripts/STOP.bat` | Detiene el sistema (Windows) |
+| `scripts/REINSTALAR.bat` | Reinstala desde cero (Windows) |
+| `scripts/LOGS.bat` | Muestra logs en tiempo real (Windows) |
+| `.env` | Configuración local (no se versiona) |
+| `.env.example` | Plantilla base |
+| `generate_env.py` | Genera valores seguros |
 
 ## Notas de Seguridad
 
-⚠️ **IMPORTANTE:** El archivo `.env` contiene credenciales sensibles. NUNCA lo subas a Git.
-
-El archivo `.gitignore` ya está configurado para ignorarlo automáticamente.
+- ⚠️ **Nunca subas** el archivo `.env` a GitHub.
+- Cambia la contraseña del usuario admin después del primer acceso.
+- Si habilitas OCR externos, configura las claves en `.env`.
 
 ## Primer Uso - Cambio de Contraseñas
 
-Después de la instalación inicial:
-
-1. Inicia sesión con `admin` / `admin123`
-2. Ve a **Configuración → Usuarios**
-3. Cambia la contraseña del administrador
-4. (Opcional) Configura Azure OCR en `.env` para mejor precisión en documentos
+1. Inicia sesión con `admin` / `admin123`.
+2. Ve a **Configuración → Usuarios**.
+3. Cambia la contraseña del administrador.
+4. Configura MFA si se despliega en producción.
 
 ## Portabilidad
 
-Este sistema está diseñado para funcionar en **cualquier PC Windows** con Docker instalado.
+Para mover el proyecto a otra máquina:
 
-Al clonar el repositorio en otro equipo:
-
-1. Ejecuta `scripts\REINSTALAR.bat`
-2. El script generará automáticamente un nuevo `.env` con credenciales únicas
-3. ¡Listo! El sistema estará operativo en 5-8 minutos
+1. Clona el repositorio.
+2. Copia `.env.example` a `.env` y ejecuta `python generate_env.py`.
+3. Inicia los servicios según la plataforma.
 
 ## Soporte
 
-Para reportar problemas o solicitar ayuda:
-- Abre un Issue en GitHub
-- Revisa los logs con `scripts\LOGS.bat`
-- Consulta la documentación completa en `CLAUDE.md`
+- Issues: abre un ticket en GitHub (recomendado privado).
+- Documentación extendida: [DOCS.md](../../DOCS.md).
+- Problemas frecuentes: [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ---
 
-**Versión:** 4.0.0  
-**Última actualización:** 2025-10-20
+**Versión:** 4.2.0  
+**Última actualización:** 2025-02-10
