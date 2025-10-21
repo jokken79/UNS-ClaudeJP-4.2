@@ -3,32 +3,72 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { employeeService } from '@/lib/api';
-import { ArrowLeftIcon, UserPlusIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, UserPlusIcon, PencilIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 
 interface EmployeeFormData {
-  uns_id: string;
+  // Identificación
+  rirekisho_id: string;
   factory_id: string;
   hakensaki_shain_id: string;
+  photo_url: string;
+
+  // Personal
   full_name_kanji: string;
   full_name_kana: string;
   date_of_birth: string;
   gender: string;
   nationality: string;
-  zairyu_card_number: string;
-  zairyu_expire_date: string;
   address: string;
   phone: string;
   email: string;
-  emergency_contact: string;
-  emergency_phone: string;
+  postal_code: string;
+
+  // Assignment
+  assignment_location: string;
+  assignment_line: string;
+  job_description: string;
+
+  // Employment
   hire_date: string;
-  jikyu: number;
+  current_hire_date: string;
+  entry_request_date: string;
   position: string;
   contract_type: string;
+
+  // Financial
+  jikyu: number;
+  jikyu_revision_date: string;
+  hourly_rate_charged: string;
+  billing_revision_date: string;
+  profit_difference: string;
+  standard_compensation: string;
+  health_insurance: string;
+  nursing_insurance: string;
+  pension_insurance: string;
+  social_insurance_date: string;
+
+  // Visa
+  visa_type: string;
+  zairyu_expire_date: string;
+
+  // Documents
+  license_type: string;
+  license_expire_date: string;
+  commute_method: string;
+  optional_insurance_expire: string;
+  japanese_level: string;
+  career_up_5years: boolean;
+
+  // Apartment
   apartment_id: string;
   apartment_start_date: string;
+  apartment_move_out_date: string;
   apartment_rent: string;
+
+  // Status & Notes
+  current_status: string;
+  notes: string;
 }
 
 interface EmployeeFormProps {
@@ -40,29 +80,53 @@ export default function EmployeeForm({ employeeId, isEdit = false }: EmployeeFor
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [formData, setFormData] = useState<EmployeeFormData>({
-    uns_id: '',
+    rirekisho_id: '',
     factory_id: '',
     hakensaki_shain_id: '',
+    photo_url: '',
     full_name_kanji: '',
     full_name_kana: '',
     date_of_birth: '',
     gender: '男',
     nationality: '',
-    zairyu_card_number: '',
-    zairyu_expire_date: '',
     address: '',
     phone: '',
     email: '',
-    emergency_contact: '',
-    emergency_phone: '',
+    postal_code: '',
+    assignment_location: '',
+    assignment_line: '',
+    job_description: '',
     hire_date: new Date().toISOString().split('T')[0],
-    jikyu: 1000,
+    current_hire_date: '',
+    entry_request_date: '',
     position: '',
     contract_type: '派遣',
+    jikyu: 1000,
+    jikyu_revision_date: '',
+    hourly_rate_charged: '',
+    billing_revision_date: '',
+    profit_difference: '',
+    standard_compensation: '',
+    health_insurance: '',
+    nursing_insurance: '',
+    pension_insurance: '',
+    social_insurance_date: '',
+    visa_type: '',
+    zairyu_expire_date: '',
+    license_type: '',
+    license_expire_date: '',
+    commute_method: '',
+    optional_insurance_expire: '',
+    japanese_level: '',
+    career_up_5years: false,
     apartment_id: '',
     apartment_start_date: '',
+    apartment_move_out_date: '',
     apartment_rent: '',
+    current_status: 'active',
+    notes: '',
   });
 
   useEffect(() => {
@@ -77,29 +141,56 @@ export default function EmployeeForm({ employeeId, isEdit = false }: EmployeeFor
       const employee = await employeeService.getEmployee(employeeId!);
 
       setFormData({
-        uns_id: employee.uns_id || '',
+        rirekisho_id: employee.rirekisho_id || '',
         factory_id: employee.factory_id || '',
         hakensaki_shain_id: employee.hakensaki_shain_id || '',
+        photo_url: employee.photo_url || '',
         full_name_kanji: employee.full_name_kanji || '',
         full_name_kana: employee.full_name_kana || '',
         date_of_birth: employee.date_of_birth || '',
         gender: employee.gender || '男',
         nationality: employee.nationality || '',
-        zairyu_card_number: employee.zairyu_card_number || '',
-        zairyu_expire_date: employee.zairyu_expire_date || '',
         address: employee.address || '',
         phone: employee.phone || '',
         email: employee.email || '',
-        emergency_contact: employee.emergency_contact || '',
-        emergency_phone: employee.emergency_phone || '',
+        postal_code: employee.postal_code || '',
+        assignment_location: employee.assignment_location || '',
+        assignment_line: employee.assignment_line || '',
+        job_description: employee.job_description || '',
         hire_date: employee.hire_date || '',
-        jikyu: employee.jikyu || 1000,
+        current_hire_date: employee.current_hire_date || '',
+        entry_request_date: employee.entry_request_date || '',
         position: employee.position || '',
         contract_type: employee.contract_type || '派遣',
+        jikyu: employee.jikyu || 1000,
+        jikyu_revision_date: employee.jikyu_revision_date || '',
+        hourly_rate_charged: employee.hourly_rate_charged ? employee.hourly_rate_charged.toString() : '',
+        billing_revision_date: employee.billing_revision_date || '',
+        profit_difference: employee.profit_difference ? employee.profit_difference.toString() : '',
+        standard_compensation: employee.standard_compensation ? employee.standard_compensation.toString() : '',
+        health_insurance: employee.health_insurance ? employee.health_insurance.toString() : '',
+        nursing_insurance: employee.nursing_insurance ? employee.nursing_insurance.toString() : '',
+        pension_insurance: employee.pension_insurance ? employee.pension_insurance.toString() : '',
+        social_insurance_date: employee.social_insurance_date || '',
+        visa_type: employee.visa_type || '',
+        zairyu_expire_date: employee.zairyu_expire_date || '',
+        license_type: employee.license_type || '',
+        license_expire_date: employee.license_expire_date || '',
+        commute_method: employee.commute_method || '',
+        optional_insurance_expire: employee.optional_insurance_expire || '',
+        japanese_level: employee.japanese_level || '',
+        career_up_5years: employee.career_up_5years || false,
         apartment_id: employee.apartment_id ? employee.apartment_id.toString() : '',
         apartment_start_date: employee.apartment_start_date || '',
+        apartment_move_out_date: employee.apartment_move_out_date || '',
         apartment_rent: employee.apartment_rent ? employee.apartment_rent.toString() : '',
+        current_status: employee.current_status || 'active',
+        notes: employee.notes || '',
       });
+
+      if (employee.photo_url) {
+        setPhotoPreview(employee.photo_url);
+      }
     } catch (err: any) {
       toast.error('従業員情報の読み込みに失敗しました');
       console.error('Error fetching employee:', err);
@@ -111,11 +202,39 @@ export default function EmployeeForm({ employeeId, isEdit = false }: EmployeeFor
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    const { name, value, type } = e.target;
+
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: checked,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // In a real implementation, you would upload the file here
+      // For now, we'll just store the preview URL
+      setFormData(prev => ({
+        ...prev,
+        photo_url: reader.result as string
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -134,10 +253,6 @@ export default function EmployeeForm({ employeeId, isEdit = false }: EmployeeFor
       toast.error('時給を正しく入力してください');
       return;
     }
-    if (!isEdit && !formData.uns_id) {
-      toast.error('UNS-IDを入力してください');
-      return;
-    }
     if (!formData.factory_id) {
       toast.error('派遣先IDを入力してください');
       return;
@@ -148,39 +263,59 @@ export default function EmployeeForm({ employeeId, isEdit = false }: EmployeeFor
 
       // Prepare data
       const submitData: any = {
+        rirekisho_id: formData.rirekisho_id || null,
+        factory_id: formData.factory_id,
+        hakensaki_shain_id: formData.hakensaki_shain_id || null,
+        photo_url: formData.photo_url || null,
         full_name_kanji: formData.full_name_kanji,
         full_name_kana: formData.full_name_kana || null,
         date_of_birth: formData.date_of_birth || null,
         gender: formData.gender || null,
         nationality: formData.nationality || null,
-        zairyu_card_number: formData.zairyu_card_number || null,
-        zairyu_expire_date: formData.zairyu_expire_date || null,
         address: formData.address || null,
         phone: formData.phone || null,
         email: formData.email || null,
-        emergency_contact: formData.emergency_contact || null,
-        emergency_phone: formData.emergency_phone || null,
-        factory_id: formData.factory_id,
-        hakensaki_shain_id: formData.hakensaki_shain_id || null,
-        jikyu: parseInt(formData.jikyu.toString()),
+        postal_code: formData.postal_code || null,
+        assignment_location: formData.assignment_location || null,
+        assignment_line: formData.assignment_line || null,
+        job_description: formData.job_description || null,
+        hire_date: formData.hire_date,
+        current_hire_date: formData.current_hire_date || null,
+        entry_request_date: formData.entry_request_date || null,
         position: formData.position || null,
+        contract_type: formData.contract_type || null,
+        jikyu: parseInt(formData.jikyu.toString()),
+        jikyu_revision_date: formData.jikyu_revision_date || null,
+        hourly_rate_charged: formData.hourly_rate_charged ? parseInt(formData.hourly_rate_charged) : null,
+        billing_revision_date: formData.billing_revision_date || null,
+        profit_difference: formData.profit_difference ? parseInt(formData.profit_difference) : null,
+        standard_compensation: formData.standard_compensation ? parseInt(formData.standard_compensation) : null,
+        health_insurance: formData.health_insurance ? parseInt(formData.health_insurance) : null,
+        nursing_insurance: formData.nursing_insurance ? parseInt(formData.nursing_insurance) : null,
+        pension_insurance: formData.pension_insurance ? parseInt(formData.pension_insurance) : null,
+        social_insurance_date: formData.social_insurance_date || null,
+        visa_type: formData.visa_type || null,
+        zairyu_expire_date: formData.zairyu_expire_date || null,
+        license_type: formData.license_type || null,
+        license_expire_date: formData.license_expire_date || null,
+        commute_method: formData.commute_method || null,
+        optional_insurance_expire: formData.optional_insurance_expire || null,
+        japanese_level: formData.japanese_level || null,
+        career_up_5years: formData.career_up_5years,
+        apartment_id: formData.apartment_id ? parseInt(formData.apartment_id) : null,
+        apartment_start_date: formData.apartment_start_date || null,
+        apartment_move_out_date: formData.apartment_move_out_date || null,
+        apartment_rent: formData.apartment_rent ? parseInt(formData.apartment_rent) : null,
+        current_status: formData.current_status || null,
+        notes: formData.notes || null,
       };
 
-      if (!isEdit) {
-        // Create new employee
-        submitData.uns_id = formData.uns_id;
-        submitData.hire_date = formData.hire_date;
-        submitData.contract_type = formData.contract_type;
-        submitData.apartment_id = formData.apartment_id ? parseInt(formData.apartment_id) : null;
-        submitData.apartment_start_date = formData.apartment_start_date || null;
-        submitData.apartment_rent = formData.apartment_rent ? parseInt(formData.apartment_rent) : null;
-
-        await employeeService.createEmployee(submitData);
-        toast.success('従業員を登録しました');
-      } else {
-        // Update existing employee
+      if (isEdit) {
         await employeeService.updateEmployee(employeeId!, submitData);
         toast.success('従業員情報を更新しました');
+      } else {
+        await employeeService.createEmployee(submitData);
+        toast.success('従業員を登録しました');
       }
 
       router.push('/employees');
@@ -222,6 +357,40 @@ export default function EmployeeForm({ employeeId, isEdit = false }: EmployeeFor
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Photo Section */}
+          <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50">
+              <h2 className="text-lg font-bold text-gray-900">写真</h2>
+            </div>
+            <div className="px-6 py-5">
+              <div className="flex items-center gap-6">
+                {photoPreview ? (
+                  <img
+                    src={photoPreview}
+                    alt="Preview"
+                    className="w-32 h-32 rounded-full object-cover border-4 border-blue-200 shadow-lg"
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center">
+                    <UserCircleIcon className="w-20 h-20 text-gray-400" />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    写真をアップロード
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                  />
+                  <p className="mt-2 text-xs text-gray-500">JPG, PNG, GIF (最大5MB)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Personal Information */}
           <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50">
@@ -229,24 +398,21 @@ export default function EmployeeForm({ employeeId, isEdit = false }: EmployeeFor
             </div>
             <div className="px-6 py-5 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {!isEdit && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      UNS-ID <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="uns_id"
-                      value={formData.uns_id}
-                      onChange={handleChange}
-                      required
-                      placeholder="UNS-2025-001"
-                      className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                    />
-                  </div>
-                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    履歴書ID
+                  </label>
+                  <input
+                    type="text"
+                    name="rirekisho_id"
+                    value={formData.rirekisho_id}
+                    onChange={handleChange}
+                    placeholder="RRS-2025-001"
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
 
-                <div className={!isEdit ? '' : 'md:col-span-2'}>
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     氏名（漢字） <span className="text-red-500">*</span>
                   </label>
@@ -320,55 +486,32 @@ export default function EmployeeForm({ employeeId, isEdit = false }: EmployeeFor
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    在留カード番号
+                    郵便番号
                   </label>
                   <input
                     type="text"
-                    name="zairyu_card_number"
-                    value={formData.zairyu_card_number}
+                    name="postal_code"
+                    value={formData.postal_code}
                     onChange={handleChange}
-                    placeholder="AB1234567"
+                    placeholder="123-4567"
                     className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                   />
                 </div>
 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    在留カード有効期限
+                    住所
                   </label>
-                  <input
-                    type="date"
-                    name="zairyu_expire_date"
-                    value={formData.zairyu_expire_date}
+                  <textarea
+                    name="address"
+                    value={formData.address}
                     onChange={handleChange}
+                    rows={2}
+                    placeholder="愛知県名古屋市..."
                     className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                   />
                 </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Contact Information */}
-          <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50">
-              <h2 className="text-lg font-bold text-gray-900">連絡先情報</h2>
-            </div>
-            <div className="px-6 py-5 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  住所
-                </label>
-                <textarea
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  rows={2}
-                  placeholder="愛知県名古屋市..."
-                  className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     電話番号
@@ -396,79 +539,17 @@ export default function EmployeeForm({ employeeId, isEdit = false }: EmployeeFor
                     className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                   />
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    緊急連絡先（氏名）
-                  </label>
-                  <input
-                    type="text"
-                    name="emergency_contact"
-                    value={formData.emergency_contact}
-                    onChange={handleChange}
-                    placeholder="山田 花子"
-                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    緊急連絡先（電話番号）
-                  </label>
-                  <input
-                    type="tel"
-                    name="emergency_phone"
-                    value={formData.emergency_phone}
-                    onChange={handleChange}
-                    placeholder="090-8765-4321"
-                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                  />
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Employment Information */}
+          {/* Assignment Information */}
           <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-              <h2 className="text-lg font-bold text-gray-900">雇用情報</h2>
+            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-yellow-50">
+              <h2 className="text-lg font-bold text-gray-900">配属情報</h2>
             </div>
             <div className="px-6 py-5 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {!isEdit && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      入社日 <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="hire_date"
-                      value={formData.hire_date}
-                      onChange={handleChange}
-                      required
-                      className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                    />
-                  </div>
-                )}
-
-                {!isEdit && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      契約形態
-                    </label>
-                    <select
-                      name="contract_type"
-                      value={formData.contract_type}
-                      onChange={handleChange}
-                      className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition appearance-none"
-                    >
-                      <option value="派遣">派遣社員</option>
-                      <option value="請負">請負社員</option>
-                      <option value="スタッフ">スタッフ</option>
-                    </select>
-                  </div>
-                )}
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     派遣先ID <span className="text-red-500">*</span>
@@ -500,6 +581,138 @@ export default function EmployeeForm({ employeeId, isEdit = false }: EmployeeFor
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                    配属先
+                  </label>
+                  <input
+                    type="text"
+                    name="assignment_location"
+                    value={formData.assignment_location}
+                    onChange={handleChange}
+                    placeholder="第一工場"
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    配属ライン
+                  </label>
+                  <input
+                    type="text"
+                    name="assignment_line"
+                    value={formData.assignment_line}
+                    onChange={handleChange}
+                    placeholder="組立ライン A"
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    仕事内容
+                  </label>
+                  <textarea
+                    name="job_description"
+                    value={formData.job_description}
+                    onChange={handleChange}
+                    rows={3}
+                    placeholder="自動車部品の組立作業..."
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Employment Information */}
+          <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+              <h2 className="text-lg font-bold text-gray-900">雇用情報</h2>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    入社日 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="hire_date"
+                    value={formData.hire_date}
+                    onChange={handleChange}
+                    required
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    現入社
+                  </label>
+                  <input
+                    type="date"
+                    name="current_hire_date"
+                    value={formData.current_hire_date}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    入社依頼
+                  </label>
+                  <input
+                    type="date"
+                    name="entry_request_date"
+                    value={formData.entry_request_date}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    契約形態
+                  </label>
+                  <select
+                    name="contract_type"
+                    value={formData.contract_type}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition appearance-none"
+                  >
+                    <option value="派遣">派遣社員</option>
+                    <option value="請負">請負社員</option>
+                    <option value="スタッフ">スタッフ</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    職種
+                  </label>
+                  <input
+                    type="text"
+                    name="position"
+                    value={formData.position}
+                    onChange={handleChange}
+                    placeholder="製造作業員"
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Financial Information */}
+          <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50">
+              <h2 className="text-lg font-bold text-gray-900">給与・保険情報</h2>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     時給 <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -521,14 +734,159 @@ export default function EmployeeForm({ employeeId, isEdit = false }: EmployeeFor
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    職種
+                    時給改定
                   </label>
                   <input
-                    type="text"
-                    name="position"
-                    value={formData.position}
+                    type="date"
+                    name="jikyu_revision_date"
+                    value={formData.jikyu_revision_date}
                     onChange={handleChange}
-                    placeholder="製造作業員"
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    請求単価
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-semibold">
+                      ¥
+                    </span>
+                    <input
+                      type="number"
+                      name="hourly_rate_charged"
+                      value={formData.hourly_rate_charged}
+                      onChange={handleChange}
+                      min="0"
+                      step="10"
+                      className="block w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    請求改定
+                  </label>
+                  <input
+                    type="date"
+                    name="billing_revision_date"
+                    value={formData.billing_revision_date}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    差額利益
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-semibold">
+                      ¥
+                    </span>
+                    <input
+                      type="number"
+                      name="profit_difference"
+                      value={formData.profit_difference}
+                      onChange={handleChange}
+                      min="0"
+                      step="10"
+                      className="block w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    標準報酬
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-semibold">
+                      ¥
+                    </span>
+                    <input
+                      type="number"
+                      name="standard_compensation"
+                      value={formData.standard_compensation}
+                      onChange={handleChange}
+                      min="0"
+                      step="1000"
+                      className="block w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    健康保険
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-semibold">
+                      ¥
+                    </span>
+                    <input
+                      type="number"
+                      name="health_insurance"
+                      value={formData.health_insurance}
+                      onChange={handleChange}
+                      min="0"
+                      step="100"
+                      className="block w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    介護保険
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-semibold">
+                      ¥
+                    </span>
+                    <input
+                      type="number"
+                      name="nursing_insurance"
+                      value={formData.nursing_insurance}
+                      onChange={handleChange}
+                      min="0"
+                      step="100"
+                      className="block w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    厚生年金
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-semibold">
+                      ¥
+                    </span>
+                    <input
+                      type="number"
+                      name="pension_insurance"
+                      value={formData.pension_insurance}
+                      onChange={handleChange}
+                      min="0"
+                      step="100"
+                      className="block w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    社保加入
+                  </label>
+                  <input
+                    type="date"
+                    name="social_insurance_date"
+                    value={formData.social_insurance_date}
+                    onChange={handleChange}
                     className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                   />
                 </div>
@@ -536,65 +894,242 @@ export default function EmployeeForm({ employeeId, isEdit = false }: EmployeeFor
             </div>
           </div>
 
-          {/* Apartment Information (only for new employees) */}
-          {!isEdit && (
-            <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
-              <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-yellow-50 to-amber-50">
-                <h2 className="text-lg font-bold text-gray-900">寮・住居情報（任意）</h2>
-              </div>
-              <div className="px-6 py-5 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      寮ID
-                    </label>
-                    <input
-                      type="text"
-                      name="apartment_id"
-                      value={formData.apartment_id}
-                      onChange={handleChange}
-                      placeholder="1"
-                      className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                    />
-                  </div>
+          {/* Visa Information */}
+          <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-red-50 to-pink-50">
+              <h2 className="text-lg font-bold text-gray-900">ビザ情報</h2>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    ビザ種類
+                  </label>
+                  <input
+                    type="text"
+                    name="visa_type"
+                    value={formData.visa_type}
+                    onChange={handleChange}
+                    placeholder="技能実習"
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      入居日
-                    </label>
-                    <input
-                      type="date"
-                      name="apartment_start_date"
-                      value={formData.apartment_start_date}
-                      onChange={handleChange}
-                      className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      家賃
-                    </label>
-                    <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-semibold">
-                        ¥
-                      </span>
-                      <input
-                        type="number"
-                        name="apartment_rent"
-                        value={formData.apartment_rent}
-                        onChange={handleChange}
-                        min="0"
-                        step="1000"
-                        placeholder="30000"
-                        className="block w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                      />
-                    </div>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    ビザ期限
+                  </label>
+                  <input
+                    type="date"
+                    name="zairyu_expire_date"
+                    value={formData.zairyu_expire_date}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
                 </div>
               </div>
             </div>
-          )}
+          </div>
+
+          {/* Documents Information */}
+          <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
+              <h2 className="text-lg font-bold text-gray-900">資格・証明書情報</h2>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    免許種類
+                  </label>
+                  <input
+                    type="text"
+                    name="license_type"
+                    value={formData.license_type}
+                    onChange={handleChange}
+                    placeholder="普通自動車免許"
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    免許期限
+                  </label>
+                  <input
+                    type="date"
+                    name="license_expire_date"
+                    value={formData.license_expire_date}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    通勤方法
+                  </label>
+                  <input
+                    type="text"
+                    name="commute_method"
+                    value={formData.commute_method}
+                    onChange={handleChange}
+                    placeholder="自転車"
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    任意保険期限
+                  </label>
+                  <input
+                    type="date"
+                    name="optional_insurance_expire"
+                    value={formData.optional_insurance_expire}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    日本語検定
+                  </label>
+                  <input
+                    type="text"
+                    name="japanese_level"
+                    value={formData.japanese_level}
+                    onChange={handleChange}
+                    placeholder="N3"
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="career_up_5years"
+                    checked={formData.career_up_5years}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                  />
+                  <label className="ml-2 block text-sm font-medium text-gray-700">
+                    キャリアアップ5年目
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Apartment Information */}
+          <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-yellow-50 to-amber-50">
+              <h2 className="text-lg font-bold text-gray-900">アパート情報</h2>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    アパートID
+                  </label>
+                  <input
+                    type="text"
+                    name="apartment_id"
+                    value={formData.apartment_id}
+                    onChange={handleChange}
+                    placeholder="1"
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    家賃
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-semibold">
+                      ¥
+                    </span>
+                    <input
+                      type="number"
+                      name="apartment_rent"
+                      value={formData.apartment_rent}
+                      onChange={handleChange}
+                      min="0"
+                      step="1000"
+                      placeholder="30000"
+                      className="block w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    入居日
+                  </label>
+                  <input
+                    type="date"
+                    name="apartment_start_date"
+                    value={formData.apartment_start_date}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    退去日
+                  </label>
+                  <input
+                    type="date"
+                    name="apartment_move_out_date"
+                    value={formData.apartment_move_out_date}
+                    onChange={handleChange}
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Status & Notes */}
+          <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-slate-50">
+              <h2 className="text-lg font-bold text-gray-900">備考・ステータス</h2>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  現在
+                </label>
+                <select
+                  name="current_status"
+                  value={formData.current_status}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition appearance-none"
+                >
+                  <option value="active">在籍中</option>
+                  <option value="terminated">退社済</option>
+                  <option value="suspended">休職中</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  備考
+                </label>
+                <textarea
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder="その他特記事項..."
+                  className="block w-full px-4 py-2.5 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                />
+              </div>
+            </div>
+          </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-4 pb-6">

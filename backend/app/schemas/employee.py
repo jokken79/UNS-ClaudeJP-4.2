@@ -61,39 +61,48 @@ class EmployeeResponse(EmployeeBase):
     rirekisho_id: Optional[str]  # Changed from uns_id
     factory_id: Optional[str]
     factory_name: Optional[str] = None  # Nombre de la fábrica
-    hakensaki_shain_id: Optional[str]
-    hire_date: Optional[date]  # Puede ser NULL
-    jikyu: int
+    hakensaki_shain_id: Optional[str]  # 派遣先ID - ID que la fábrica asigna al empleado
+    hire_date: Optional[date]  # 入社日
+    current_hire_date: Optional[date]  # 現入社 - Fecha de entrada a fábrica actual
+    jikyu: int  # 時給
+    jikyu_revision_date: Optional[date]  # 時給改定
     photo_url: Optional[str] = None  # Added photo
     position: Optional[str]
     contract_type: Optional[str]
 
+    # Assignment information
+    assignment_location: Optional[str]  # 配属先
+    assignment_line: Optional[str]  # 配属ライン
+    job_description: Optional[str]  # 仕事内容
+
     # Financial
-    hourly_rate_charged: Optional[int]
-    profit_difference: Optional[int]
-    standard_compensation: Optional[int]
-    health_insurance: Optional[int]
-    nursing_insurance: Optional[int]
-    pension_insurance: Optional[int]
-    social_insurance_date: Optional[date]
+    hourly_rate_charged: Optional[int]  # 請求単価
+    billing_revision_date: Optional[date]  # 請求改定
+    profit_difference: Optional[int]  # 差額利益
+    standard_compensation: Optional[int]  # 標準報酬
+    health_insurance: Optional[int]  # 健康保険
+    nursing_insurance: Optional[int]  # 介護保険
+    pension_insurance: Optional[int]  # 厚生年金
+    social_insurance_date: Optional[date]  # 社保加入日
 
     # Visa and documents
-    visa_type: Optional[str]
-    license_type: Optional[str]
-    license_expire_date: Optional[date]
-    commute_method: Optional[str]
-    optional_insurance_expire: Optional[date]
-    japanese_level: Optional[str]
-    career_up_5years: Optional[bool]
-    entry_request_date: Optional[date]
-    photo_url: Optional[str]
-    notes: Optional[str]
-    postal_code: Optional[str]
+    visa_type: Optional[str]  # ビザ種類
+    visa_renewal_alert: Optional[bool]  # ビザ更新アラート
+    visa_alert_days: Optional[int]  # アラート日数
+    license_type: Optional[str]  # 免許種類
+    license_expire_date: Optional[date]  # 免許期限
+    commute_method: Optional[str]  # 通勤方法
+    optional_insurance_expire: Optional[date]  # 任意保険期限
+    japanese_level: Optional[str]  # 日本語検定
+    career_up_5years: Optional[bool]  # キャリアアップ5年目
+    entry_request_date: Optional[date]  # 入社依頼日
+    notes: Optional[str]  # 備考
+    postal_code: Optional[str]  # 〒
 
     # Apartment
-    apartment_id: Optional[int]
-    apartment_start_date: Optional[date]
-    apartment_move_out_date: Optional[date]
+    apartment_id: Optional[int]  # アパートID
+    apartment_start_date: Optional[date]  # 入居日
+    apartment_move_out_date: Optional[date]  # 退去日
     apartment_rent: Optional[int]
 
     # Yukyu
@@ -102,8 +111,9 @@ class EmployeeResponse(EmployeeBase):
     yukyu_remaining: int
 
     # Status
+    current_status: Optional[str]  # 現在: active, terminated, suspended
     is_active: bool
-    termination_date: Optional[date]
+    termination_date: Optional[date]  # 退社日
     termination_reason: Optional[str]
     created_at: datetime
     updated_at: Optional[datetime]

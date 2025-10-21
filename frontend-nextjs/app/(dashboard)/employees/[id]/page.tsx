@@ -21,34 +21,79 @@ import {
 interface Employee {
   id: number;
   hakenmoto_id: number;
-  uns_id: string;
-  factory_id: string;
+  rirekisho_id: string | null;
+  factory_id: string | null;
+  factory_name: string | null;
   hakensaki_shain_id: string | null;
+  photo_url: string | null;
+
+  // Personal
   full_name_kanji: string;
   full_name_kana: string | null;
   date_of_birth: string | null;
   gender: string | null;
   nationality: string | null;
-  zairyu_card_number: string | null;
-  zairyu_expire_date: string | null;
   address: string | null;
   phone: string | null;
   email: string | null;
-  emergency_contact: string | null;
-  emergency_phone: string | null;
+  postal_code: string | null;
+
+  // Assignment
+  assignment_location: string | null;
+  assignment_line: string | null;
+  job_description: string | null;
+
+  // Employment
   hire_date: string;
+  current_hire_date: string | null;
+  entry_request_date: string | null;
+  termination_date: string | null;
+
+  // Financial
   jikyu: number;
-  position: string | null;
-  contract_type: string | null;
+  jikyu_revision_date: string | null;
+  hourly_rate_charged: number | null;
+  billing_revision_date: string | null;
+  profit_difference: number | null;
+  standard_compensation: number | null;
+  health_insurance: number | null;
+  nursing_insurance: number | null;
+  pension_insurance: number | null;
+  social_insurance_date: string | null;
+
+  // Visa
+  visa_type: string | null;
+  zairyu_expire_date: string | null;
+  visa_renewal_alert: boolean | null;
+  visa_alert_days: number | null;
+
+  // Documents
+  license_type: string | null;
+  license_expire_date: string | null;
+  commute_method: string | null;
+  optional_insurance_expire: string | null;
+  japanese_level: string | null;
+  career_up_5years: boolean | null;
+
+  // Apartment
   apartment_id: number | null;
   apartment_start_date: string | null;
+  apartment_move_out_date: string | null;
   apartment_rent: number | null;
+
+  // Yukyu
   yukyu_total: number;
   yukyu_used: number;
   yukyu_remaining: number;
+
+  // Status
+  current_status: string | null;
   is_active: boolean;
-  termination_date: string | null;
+  notes: string | null;
+  contract_type: string | null;
+  position: string | null;
   termination_reason: string | null;
+
   created_at: string;
   updated_at: string | null;
 }
@@ -154,19 +199,6 @@ export default function EmployeeDetailPage() {
               <ArrowLeftIcon className="h-5 w-5 mr-2" />
               戻る
             </button>
-            <div>
-              <div className="flex items-center space-x-3 flex-wrap">
-                <h1 className="text-3xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  {employee.full_name_kanji}
-                </h1>
-                {getStatusBadge(employee.is_active)}
-                {getContractTypeBadge(employee.contract_type)}
-              </div>
-              <p className="mt-2 text-sm text-gray-600">
-                社員№ <span className="font-semibold">{employee.hakenmoto_id}</span> | UNS-ID:{' '}
-                <span className="font-semibold">{employee.uns_id}</span>
-              </p>
-            </div>
           </div>
           <button
             onClick={() => router.push(`/employees/${employee.id}/edit`)}
@@ -175,6 +207,34 @@ export default function EmployeeDetailPage() {
             <PencilIcon className="h-5 w-5 mr-2" />
             編集
           </button>
+        </div>
+
+        {/* Header con foto */}
+        <div className="flex items-center gap-6 mb-8">
+          {employee.photo_url ? (
+            <img
+              src={employee.photo_url}
+              alt={employee.full_name_kanji}
+              className="w-32 h-32 rounded-full object-cover border-4 border-blue-200 shadow-lg"
+            />
+          ) : (
+            <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center">
+              <UserCircleIcon className="w-20 h-20 text-gray-400" />
+            </div>
+          )}
+          <div>
+            <div className="flex items-center space-x-3 flex-wrap">
+              <h1 className="text-3xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                {employee.full_name_kanji}
+              </h1>
+              {getStatusBadge(employee.is_active)}
+              {getContractTypeBadge(employee.contract_type)}
+            </div>
+            <p className="mt-2 text-sm text-gray-600">
+              社員№ <span className="font-semibold">{employee.hakenmoto_id}</span>
+              {employee.rirekisho_id && <> | 履歴書ID: <span className="font-semibold">{employee.rirekisho_id}</span></>}
+            </p>
+          </div>
         </div>
 
         {/* Visa Expiring Soon Alert */}
@@ -232,22 +292,43 @@ export default function EmployeeDetailPage() {
                     <dt className="text-sm font-medium text-gray-500">国籍</dt>
                     <dd className="mt-1 text-sm text-gray-900">{employee.nationality || '-'}</dd>
                   </div>
+                  <div className="sm:col-span-2">
+                    <dt className="text-sm font-medium text-gray-500">郵便番号</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{employee.postal_code || '-'}</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+
+            {/* Assignment Information */}
+            <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center">
+                  <BuildingOfficeIcon className="h-6 w-6 mr-2 text-orange-500" />
+                  配属情報
+                </h2>
+              </div>
+              <div className="px-6 py-5">
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">在留カード番号</dt>
-                    <dd className="mt-1 text-sm text-gray-900 font-mono">{employee.zairyu_card_number || '-'}</dd>
+                    <dt className="text-sm font-medium text-gray-500">派遣先</dt>
+                    <dd className="mt-1 text-sm text-gray-900 font-semibold">{employee.factory_name || employee.factory_id || '-'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">派遣先社員ID</dt>
+                    <dd className="mt-1 text-sm text-gray-900 font-mono">{employee.hakensaki_shain_id || '-'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">配属先</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{employee.assignment_location || '-'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">配属ライン</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{employee.assignment_line || '-'}</dd>
                   </div>
                   <div className="sm:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">在留カード有効期限</dt>
-                    <dd
-                      className={`mt-1 text-sm ${
-                        isVisaExpiringSoon(employee.zairyu_expire_date)
-                          ? 'text-yellow-600 font-semibold'
-                          : 'text-gray-900'
-                      }`}
-                    >
-                      {formatDate(employee.zairyu_expire_date)}
-                      {isVisaExpiringSoon(employee.zairyu_expire_date) && ' ⚠️'}
-                    </dd>
+                    <dt className="text-sm font-medium text-gray-500">仕事内容</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{employee.job_description || '-'}</dd>
                   </div>
                 </dl>
               </div>
@@ -318,24 +399,20 @@ export default function EmployeeDetailPage() {
                     <dd className="mt-1 text-sm text-gray-900">{formatDate(employee.hire_date)}</dd>
                   </div>
                   <div>
+                    <dt className="text-sm font-medium text-gray-500">現入社</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatDate(employee.current_hire_date)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">入社依頼</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatDate(employee.entry_request_date)}</dd>
+                  </div>
+                  <div>
                     <dt className="text-sm font-medium text-gray-500">契約形態</dt>
                     <dd className="mt-1 text-sm">{getContractTypeBadge(employee.contract_type)}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">時給</dt>
-                    <dd className="mt-1 text-lg font-bold text-indigo-600">{formatCurrency(employee.jikyu)}</dd>
-                  </div>
-                  <div>
                     <dt className="text-sm font-medium text-gray-500">職種</dt>
                     <dd className="mt-1 text-sm text-gray-900">{employee.position || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">派遣先ID</dt>
-                    <dd className="mt-1 text-sm text-gray-900 font-mono">{employee.factory_id}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">派遣先社員ID</dt>
-                    <dd className="mt-1 text-sm text-gray-900 font-mono">{employee.hakensaki_shain_id || '-'}</dd>
                   </div>
                   {!employee.is_active && (
                     <>
@@ -353,32 +430,196 @@ export default function EmployeeDetailPage() {
               </div>
             </div>
 
+            {/* Financial Information */}
+            <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center">
+                  <BanknotesIcon className="h-6 w-6 mr-2 text-green-500" />
+                  給与・保険情報
+                </h2>
+              </div>
+              <div className="px-6 py-5">
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">時給</dt>
+                    <dd className="mt-1 text-lg font-bold text-indigo-600">{formatCurrency(employee.jikyu)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">時給改定</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatDate(employee.jikyu_revision_date)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">請求単価</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatCurrency(employee.hourly_rate_charged)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">請求改定</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatDate(employee.billing_revision_date)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">差額利益</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatCurrency(employee.profit_difference)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">標準報酬</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatCurrency(employee.standard_compensation)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">健康保険</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatCurrency(employee.health_insurance)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">介護保険</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatCurrency(employee.nursing_insurance)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">厚生年金</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatCurrency(employee.pension_insurance)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">社保加入</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatDate(employee.social_insurance_date)}</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+
+            {/* Visa Information */}
+            <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center">
+                  <DocumentTextIcon className="h-6 w-6 mr-2 text-red-500" />
+                  ビザ情報
+                </h2>
+              </div>
+              <div className="px-6 py-5">
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">ビザ種類</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{employee.visa_type || '-'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">ビザ期限</dt>
+                    <dd
+                      className={`mt-1 text-sm ${
+                        isVisaExpiringSoon(employee.zairyu_expire_date)
+                          ? 'text-yellow-600 font-semibold'
+                          : 'text-gray-900'
+                      }`}
+                    >
+                      {formatDate(employee.zairyu_expire_date)}
+                      {isVisaExpiringSoon(employee.zairyu_expire_date) && ' ⚠️'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">更新アラート</dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {employee.visa_renewal_alert ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                          ⚠️ 有効
+                        </span>
+                      ) : (
+                        '-'
+                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">アラート日数</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{employee.visa_alert_days ? `${employee.visa_alert_days}日前` : '-'}</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+
+            {/* Documents Information */}
+            <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center">
+                  <DocumentTextIcon className="h-6 w-6 mr-2 text-purple-500" />
+                  資格・証明書情報
+                </h2>
+              </div>
+              <div className="px-6 py-5">
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">免許種類</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{employee.license_type || '-'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">免許期限</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatDate(employee.license_expire_date)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">通勤方法</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{employee.commute_method || '-'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">任意保険期限</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatDate(employee.optional_insurance_expire)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">日本語検定</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{employee.japanese_level || '-'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">キャリアアップ5年目</dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {employee.career_up_5years ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          ✓ 該当
+                        </span>
+                      ) : (
+                        '-'
+                      )}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+
             {/* Apartment Information */}
-            {employee.apartment_id && (
+            <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center">
+                  <HomeIcon className="h-6 w-6 mr-2 text-purple-500" />
+                  アパート情報
+                </h2>
+              </div>
+              <div className="px-6 py-5">
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">アパートID</dt>
+                    <dd className="mt-1 text-sm text-gray-900 font-mono">{employee.apartment_id ? `#${employee.apartment_id}` : '-'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">家賃</dt>
+                    <dd className="mt-1 text-sm text-gray-900 font-semibold">
+                      {formatCurrency(employee.apartment_rent)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">入居日</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatDate(employee.apartment_start_date)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">退去日</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{formatDate(employee.apartment_move_out_date)}</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+
+            {/* Notes */}
+            {employee.notes && (
               <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
                 <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
                   <h2 className="text-lg font-bold text-gray-900 flex items-center">
-                    <HomeIcon className="h-6 w-6 mr-2 text-purple-500" />
-                    寮・住居情報
+                    <DocumentTextIcon className="h-6 w-6 mr-2 text-gray-500" />
+                    備考
                   </h2>
                 </div>
                 <div className="px-6 py-5">
-                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">寮ID</dt>
-                      <dd className="mt-1 text-sm text-gray-900 font-mono">{employee.apartment_id}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">入居日</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{formatDate(employee.apartment_start_date)}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">家賃</dt>
-                      <dd className="mt-1 text-sm text-gray-900 font-semibold">
-                        {employee.apartment_rent ? formatCurrency(employee.apartment_rent) : '-'}
-                      </dd>
-                    </div>
-                  </dl>
+                  <p className="text-sm text-gray-900 whitespace-pre-wrap">{employee.notes}</p>
                 </div>
               </div>
             )}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { employeeService } from '@/lib/api';
@@ -10,12 +10,22 @@ import {
   UserPlusIcon,
   PencilIcon,
   EyeIcon,
+  AdjustmentsHorizontalIcon,
+  XMarkIcon,
+  UserCircleIcon,
 } from '@heroicons/react/24/outline';
 
+// Complete Employee interface with ALL 42+ fields
 interface Employee {
   id: number;
   hakenmoto_id: number;
-  uns_id: string;
+  rirekisho_id: string | null;
+  factory_id: string | null;
+  factory_name: string | null;
+  hakensaki_shain_id: string | null;
+  photo_url: string | null;
+
+  // Personal
   full_name_kanji: string;
   full_name_kana: string | null;
   date_of_birth: string | null;
@@ -24,18 +34,59 @@ interface Employee {
   address: string | null;
   phone: string | null;
   email: string | null;
+  postal_code: string | null;
+
+  // Assignment
+  assignment_location: string | null;
+  assignment_line: string | null;
+  job_description: string | null;
+
+  // Employment
+  hire_date: string;
+  current_hire_date: string | null;
+  entry_request_date: string | null;
+  termination_date: string | null;
+
+  // Financial
+  jikyu: number;
+  jikyu_revision_date: string | null;
+  hourly_rate_charged: number | null;
+  billing_revision_date: string | null;
+  profit_difference: number | null;
+  standard_compensation: number | null;
+  health_insurance: number | null;
+  nursing_insurance: number | null;
+  pension_insurance: number | null;
+  social_insurance_date: string | null;
+
+  // Visa
   visa_type: string | null;
   zairyu_expire_date: string | null;
-  factory_id: string;
-  factory_name: string | null;
-  hire_date: string;
-  jikyu: number;
-  hourly_rate_charged: number | null;
-  contract_type: string | null;
-  is_active: boolean;
-  termination_date: string | null;
+  visa_renewal_alert: boolean | null;
+  visa_alert_days: number | null;
+
+  // Documents
+  license_type: string | null;
+  license_expire_date: string | null;
+  commute_method: string | null;
+  optional_insurance_expire: string | null;
+  japanese_level: string | null;
+  career_up_5years: boolean | null;
+
+  // Apartment
+  apartment_id: number | null;
+  apartment_start_date: string | null;
+  apartment_move_out_date: string | null;
+  apartment_rent: number | null;
+
+  // Yukyu
   yukyu_remaining: number;
-  status?: string;
+
+  // Status
+  current_status: string | null;
+  is_active: boolean;
+  notes: string | null;
+  contract_type: string | null;
 }
 
 interface PaginatedResponse {
@@ -46,66 +97,286 @@ interface PaginatedResponse {
   total_pages: number;
 }
 
+// Column key type with ALL 44 columns
 type ColumnKey =
-  | 'employeeNumber'
-  | 'fullName'
-  | 'kanaName'
-  | 'dateOfBirth'
+  | 'photo'
+  | 'current_status'
+  | 'hakenmoto_id'
+  | 'hakensaki_shain_id'
+  | 'factory_name'
+  | 'assignment_location'
+  | 'assignment_line'
+  | 'job_description'
+  | 'full_name_kanji'
+  | 'full_name_kana'
   | 'gender'
   | 'nationality'
-  | 'contractType'
-  | 'factory'
-  | 'hourlyWage'
-  | 'hourlyRateCharged'
-  | 'hireDate'
-  | 'phone'
-  | 'email'
+  | 'date_of_birth'
+  | 'age'
+  | 'jikyu'
+  | 'jikyu_revision_date'
+  | 'hourly_rate_charged'
+  | 'billing_revision_date'
+  | 'profit_difference'
+  | 'standard_compensation'
+  | 'health_insurance'
+  | 'nursing_insurance'
+  | 'pension_insurance'
+  | 'zairyu_expire_date'
+  | 'visa_renewal_alert'
+  | 'visa_type'
+  | 'postal_code'
   | 'address'
-  | 'visaType'
-  | 'zairyuExpireDate'
-  | 'yukyuRemaining'
-  | 'status'
-  | 'terminationDate'
+  | 'apartment_id'
+  | 'apartment_start_date'
+  | 'hire_date'
+  | 'termination_date'
+  | 'apartment_move_out_date'
+  | 'social_insurance_date'
+  | 'entry_request_date'
+  | 'notes'
+  | 'current_hire_date'
+  | 'license_type'
+  | 'license_expire_date'
+  | 'commute_method'
+  | 'optional_insurance_expire'
+  | 'japanese_level'
+  | 'career_up_5years'
   | 'actions';
 
 interface ColumnDefinition {
   key: ColumnKey;
   label: string;
-  headerClassName: string;
-  cellClassName: string;
+  defaultWidth: number;
   render: (employee: Employee) => React.ReactNode;
 }
 
+// Resizable Column Component
+interface ResizableColumnProps {
+  columnKey: ColumnKey;
+  width: number;
+  onResize: (key: ColumnKey, width: number) => void;
+  children: React.ReactNode;
+  isSticky?: boolean;
+}
+
+const ResizableColumn: React.FC<ResizableColumnProps> = ({
+  columnKey,
+  width,
+  onResize,
+  children,
+  isSticky = false,
+}) => {
+  const [isResizing, setIsResizing] = useState(false);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+
+    const startX = e.clientX;
+    const startWidth = width;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const diff = e.clientX - startX;
+      const newWidth = Math.max(80, Math.min(500, startWidth + diff));
+      onResize(columnKey, newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  return (
+    <th
+      style={{
+        width: `${width}px`,
+        minWidth: `${width}px`,
+        maxWidth: `${width}px`,
+        position: isSticky ? 'sticky' : 'relative',
+        left: isSticky ? 0 : 'auto',
+        zIndex: isSticky ? 20 : 10,
+        backgroundColor: isSticky ? '#f9fafb' : 'transparent',
+      }}
+      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200"
+    >
+      <div className="flex items-center justify-between">
+        {children}
+      </div>
+      <div
+        onMouseDown={handleMouseDown}
+        className={`absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-400 ${
+          isResizing ? 'bg-blue-500' : 'bg-transparent'
+        }`}
+        style={{ zIndex: 30 }}
+      />
+    </th>
+  );
+};
+
 export default function EmployeesPage() {
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState(''); // Local input value
+  const [searchTerm, setSearchTerm] = useState(''); // Debounced search value
   const [filterActive, setFilterActive] = useState<boolean | null>(null);
   const [filterFactory, setFilterFactory] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showColumnSelector, setShowColumnSelector] = useState(false);
   const pageSize = 500;
 
-  const [visibleColumns, setVisibleColumns] = useState<Record<ColumnKey, boolean>>({
-    employeeNumber: true,
-    fullName: true,
-    kanaName: true,
-    dateOfBirth: false,
-    gender: false,
-    nationality: true,
-    contractType: true,
-    factory: true,
-    hourlyWage: true,
-    hourlyRateCharged: false,
-    hireDate: true,
-    phone: false,
-    email: false,
-    address: false,
-    visaType: false,
-    zairyuExpireDate: false,
-    yukyuRemaining: false,
-    status: true,
-    terminationDate: false,
-    actions: true,
+  // Debounce search input - espera 500ms después de que el usuario deje de escribir
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  // Load column widths from localStorage
+  const [columnWidths, setColumnWidths] = useState<Record<ColumnKey, number>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('employeeColumnWidths');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Failed to parse column widths:', e);
+        }
+      }
+    }
+    // Default widths for all columns
+    return {
+      photo: 80,
+      current_status: 100,
+      hakenmoto_id: 100,
+      hakensaki_shain_id: 140,
+      factory_name: 180,
+      assignment_location: 120,
+      assignment_line: 120,
+      job_description: 200,
+      full_name_kanji: 140,
+      full_name_kana: 140,
+      gender: 80,
+      nationality: 100,
+      date_of_birth: 120,
+      age: 80,
+      jikyu: 100,
+      jikyu_revision_date: 120,
+      hourly_rate_charged: 120,
+      billing_revision_date: 120,
+      profit_difference: 120,
+      standard_compensation: 120,
+      health_insurance: 120,
+      nursing_insurance: 120,
+      pension_insurance: 120,
+      zairyu_expire_date: 120,
+      visa_renewal_alert: 140,
+      visa_type: 140,
+      postal_code: 120,
+      address: 250,
+      apartment_id: 120,
+      apartment_start_date: 120,
+      hire_date: 120,
+      termination_date: 120,
+      apartment_move_out_date: 120,
+      social_insurance_date: 120,
+      entry_request_date: 120,
+      notes: 200,
+      current_hire_date: 120,
+      license_type: 120,
+      license_expire_date: 120,
+      commute_method: 120,
+      optional_insurance_expire: 140,
+      japanese_level: 120,
+      career_up_5years: 140,
+      actions: 120,
+    };
   });
+
+  // Load visible columns from localStorage - Default to top 10 important columns
+  const [visibleColumns, setVisibleColumns] = useState<Record<ColumnKey, boolean>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('employeeVisibleColumns');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          // ALWAYS ensure 'photo' column exists in saved data (for backward compatibility)
+          if (!('photo' in parsed)) {
+            parsed.photo = true;
+          }
+          return parsed;
+        } catch (e) {
+          console.error('Failed to parse visible columns:', e);
+        }
+      }
+    }
+    // Default visible columns (top 10)
+    return {
+      photo: true,
+      current_status: true,
+      hakenmoto_id: true,
+      hakensaki_shain_id: true,
+      factory_name: true,
+      assignment_location: false,
+      assignment_line: false,
+      job_description: false,
+      full_name_kanji: true,
+      full_name_kana: false,
+      gender: false,
+      nationality: false,
+      date_of_birth: false,
+      age: false,
+      jikyu: true,
+      jikyu_revision_date: false,
+      hourly_rate_charged: false,
+      billing_revision_date: false,
+      profit_difference: false,
+      standard_compensation: false,
+      health_insurance: false,
+      nursing_insurance: false,
+      pension_insurance: false,
+      zairyu_expire_date: true,
+      visa_renewal_alert: false,
+      visa_type: false,
+      postal_code: false,
+      address: false,
+      apartment_id: false,
+      apartment_start_date: false,
+      hire_date: true,
+      termination_date: false,
+      apartment_move_out_date: false,
+      social_insurance_date: false,
+      entry_request_date: false,
+      notes: true,
+      current_hire_date: false,
+      license_type: false,
+      license_expire_date: false,
+      commute_method: false,
+      optional_insurance_expire: false,
+      japanese_level: false,
+      career_up_5years: false,
+      actions: true,
+    };
+  });
+
+  // Save to localStorage when changed
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('employeeColumnWidths', JSON.stringify(columnWidths));
+    }
+  }, [columnWidths]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('employeeVisibleColumns', JSON.stringify(visibleColumns));
+    }
+  }, [visibleColumns]);
 
   // Fetch employees with React Query
   const { data, isLoading, error } = useQuery<PaginatedResponse>({
@@ -128,198 +399,361 @@ export default function EmployeesPage() {
   const total = data?.total || 0;
   const totalPages = data?.total_pages || 1;
 
+  // Helper functions
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('ja-JP');
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number | null) => {
+    if (amount === null) return '-';
     return `¥${amount.toLocaleString()}`;
   };
 
-  const getStatusBadge = (isActive: boolean) => {
-    if (isActive) {
-      return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-          在籍中
-        </span>
-      );
-    } else {
-      return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-          退社済
-        </span>
-      );
+  const calculateAge = (dateOfBirth: string | null) => {
+    if (!dateOfBirth) return '-';
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
     }
+    return `${age}歳`;
   };
 
-  const getContractTypeBadge = (contractType: string | null) => {
-    const types: { [key: string]: { label: string; color: string } } = {
-      '派遣': { label: '派遣社員', color: 'bg-blue-100 text-blue-800' },
-      '請負': { label: '請負社員', color: 'bg-purple-100 text-purple-800' },
-      'スタッフ': { label: 'スタッフ', color: 'bg-yellow-100 text-yellow-800' },
+  const getStatusBadge = (status: string | null) => {
+    const statusMap: Record<string, { label: string; color: string }> = {
+      active: { label: '在籍中', color: 'bg-green-100 text-green-800' },
+      terminated: { label: '退社済', color: 'bg-gray-100 text-gray-800' },
+      suspended: { label: '休職中', color: 'bg-yellow-100 text-yellow-800' },
     };
 
-    const type = contractType ? types[contractType] : null;
-    if (!type) return '-';
+    const statusInfo = status ? statusMap[status] : null;
+    if (!statusInfo) return '-';
 
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${type.color}`}>
-        {type.label}
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.color}`}>
+        {statusInfo.label}
       </span>
     );
   };
 
+  const getVisaAlertBadge = (alert: boolean | null, expireDate: string | null) => {
+    if (!alert) return '-';
+
+    const isExpiringSoon = expireDate && new Date(expireDate) < new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+        isExpiringSoon ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
+      }`}>
+        {isExpiringSoon ? '⚠️ 要更新' : '⚠️ 確認'}
+      </span>
+    );
+  };
+
+  // All 44 column definitions in Excel order
   const columnDefinitions: ColumnDefinition[] = [
     {
-      key: 'employeeNumber',
+      key: 'photo',
+      label: '写真',
+      defaultWidth: 80,
+      render: (emp) => (
+        emp.photo_url ? (
+          <img
+            src={emp.photo_url}
+            alt={emp.full_name_kanji}
+            className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+          />
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+            <UserCircleIcon className="w-8 h-8 text-gray-400" />
+          </div>
+        )
+      ),
+    },
+    {
+      key: 'current_status',
+      label: '現在',
+      defaultWidth: 100,
+      render: (emp) => getStatusBadge(emp.current_status),
+    },
+    {
+      key: 'hakenmoto_id',
       label: '社員№',
-      headerClassName: 'px-8 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-8 py-4 whitespace-nowrap text-sm font-medium text-gray-900',
-      render: (employee) => employee.hakenmoto_id,
+      defaultWidth: 100,
+      render: (emp) => emp.hakenmoto_id,
     },
     {
-      key: 'fullName',
+      key: 'hakensaki_shain_id',
+      label: '派遣先ID',
+      defaultWidth: 140,
+      render: (emp) => (
+        <span className="font-medium text-blue-600">{emp.hakensaki_shain_id || '-'}</span>
+      ),
+    },
+    {
+      key: 'factory_name',
+      label: '派遣先',
+      defaultWidth: 180,
+      render: (emp) => emp.factory_name || emp.factory_id || '-',
+    },
+    {
+      key: 'assignment_location',
+      label: '配属先',
+      defaultWidth: 120,
+      render: (emp) => emp.assignment_location || '-',
+    },
+    {
+      key: 'assignment_line',
+      label: '配属ライン',
+      defaultWidth: 120,
+      render: (emp) => emp.assignment_line || '-',
+    },
+    {
+      key: 'job_description',
+      label: '仕事内容',
+      defaultWidth: 200,
+      render: (emp) => (
+        <span className="truncate max-w-[180px] inline-block" title={emp.job_description || ''}>
+          {emp.job_description || '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'full_name_kanji',
       label: '氏名',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-900',
-      render: (employee) => employee.full_name_kanji,
+      defaultWidth: 140,
+      render: (emp) => emp.full_name_kanji,
     },
     {
-      key: 'kanaName',
+      key: 'full_name_kana',
       label: 'カナ',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
-      render: (employee) => employee.full_name_kana || '-',
-    },
-    {
-      key: 'dateOfBirth',
-      label: '生年月日',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
-      render: (employee) => formatDate(employee.date_of_birth),
+      defaultWidth: 140,
+      render: (emp) => emp.full_name_kana || '-',
     },
     {
       key: 'gender',
       label: '性別',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
-      render: (employee) => employee.gender || '-',
+      defaultWidth: 80,
+      render: (emp) => emp.gender || '-',
     },
     {
       key: 'nationality',
       label: '国籍',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
-      render: (employee) => employee.nationality || '-',
+      defaultWidth: 100,
+      render: (emp) => emp.nationality || '-',
     },
     {
-      key: 'contractType',
-      label: '契約形態',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm',
-      render: (employee) => getContractTypeBadge(employee.contract_type),
+      key: 'date_of_birth',
+      label: '生年月日',
+      defaultWidth: 120,
+      render: (emp) => formatDate(emp.date_of_birth),
     },
     {
-      key: 'factory',
-      label: '派遣先',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-900',
-      render: (employee) => employee.factory_name || employee.factory_id || '-',
+      key: 'age',
+      label: '年齢',
+      defaultWidth: 80,
+      render: (emp) => calculateAge(emp.date_of_birth),
     },
     {
-      key: 'hourlyWage',
+      key: 'jikyu',
       label: '時給',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-900',
-      render: (employee) => formatCurrency(employee.jikyu),
+      defaultWidth: 100,
+      render: (emp) => formatCurrency(emp.jikyu),
     },
     {
-      key: 'hourlyRateCharged',
-      label: '請求時給',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-900',
-      render: (employee) => formatCurrency(employee.hourly_rate_charged || 0),
+      key: 'jikyu_revision_date',
+      label: '時給改定',
+      defaultWidth: 120,
+      render: (emp) => formatDate(emp.jikyu_revision_date),
     },
     {
-      key: 'hireDate',
-      label: '入社日',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
-      render: (employee) => formatDate(employee.hire_date),
+      key: 'hourly_rate_charged',
+      label: '請求単価',
+      defaultWidth: 120,
+      render: (emp) => formatCurrency(emp.hourly_rate_charged),
     },
     {
-      key: 'phone',
-      label: '電話番号',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
-      render: (employee) => employee.phone || '-',
+      key: 'billing_revision_date',
+      label: '請求改定',
+      defaultWidth: 120,
+      render: (emp) => formatDate(emp.billing_revision_date),
     },
     {
-      key: 'email',
-      label: 'メール',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
-      render: (employee) => employee.email || '-',
+      key: 'profit_difference',
+      label: '差額利益',
+      defaultWidth: 120,
+      render: (emp) => formatCurrency(emp.profit_difference),
+    },
+    {
+      key: 'standard_compensation',
+      label: '標準報酬',
+      defaultWidth: 120,
+      render: (emp) => formatCurrency(emp.standard_compensation),
+    },
+    {
+      key: 'health_insurance',
+      label: '健康保険',
+      defaultWidth: 120,
+      render: (emp) => formatCurrency(emp.health_insurance),
+    },
+    {
+      key: 'nursing_insurance',
+      label: '介護保険',
+      defaultWidth: 120,
+      render: (emp) => formatCurrency(emp.nursing_insurance),
+    },
+    {
+      key: 'pension_insurance',
+      label: '厚生年金',
+      defaultWidth: 120,
+      render: (emp) => formatCurrency(emp.pension_insurance),
+    },
+    {
+      key: 'zairyu_expire_date',
+      label: 'ビザ期限',
+      defaultWidth: 120,
+      render: (emp) => formatDate(emp.zairyu_expire_date),
+    },
+    {
+      key: 'visa_renewal_alert',
+      label: 'ｱﾗｰﾄ(ﾋﾞｻﾞ更新)',
+      defaultWidth: 140,
+      render: (emp) => getVisaAlertBadge(emp.visa_renewal_alert, emp.zairyu_expire_date),
+    },
+    {
+      key: 'visa_type',
+      label: 'ビザ種類',
+      defaultWidth: 140,
+      render: (emp) => emp.visa_type || '-',
+    },
+    {
+      key: 'postal_code',
+      label: '〒',
+      defaultWidth: 120,
+      render: (emp) => emp.postal_code || '-',
     },
     {
       key: 'address',
       label: '住所',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-w-xs truncate',
-      render: (employee) => employee.address || '-',
+      defaultWidth: 250,
+      render: (emp) => (
+        <span className="truncate max-w-[230px] inline-block" title={emp.address || ''}>
+          {emp.address || '-'}
+        </span>
+      ),
     },
     {
-      key: 'visaType',
-      label: 'ビザ種類',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
-      render: (employee) => employee.visa_type || '-',
+      key: 'apartment_id',
+      label: 'ｱﾊﾟｰﾄ',
+      defaultWidth: 120,
+      render: (emp) => emp.apartment_id ? `#${emp.apartment_id}` : '-',
     },
     {
-      key: 'zairyuExpireDate',
-      label: '在留期限',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
-      render: (employee) => formatDate(employee.zairyu_expire_date),
+      key: 'apartment_start_date',
+      label: '入居',
+      defaultWidth: 120,
+      render: (emp) => formatDate(emp.apartment_start_date),
     },
     {
-      key: 'yukyuRemaining',
-      label: '有給残日数',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-900',
-      render: (employee) => `${employee.yukyu_remaining || 0}日`,
+      key: 'hire_date',
+      label: '入社日',
+      defaultWidth: 120,
+      render: (emp) => formatDate(emp.hire_date),
     },
     {
-      key: 'status',
-      label: '状態',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap',
-      render: (employee) => getStatusBadge(employee.is_active),
-    },
-    {
-      key: 'terminationDate',
+      key: 'termination_date',
       label: '退社日',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500',
-      render: (employee) => formatDate(employee.termination_date),
+      defaultWidth: 120,
+      render: (emp) => formatDate(emp.termination_date),
+    },
+    {
+      key: 'apartment_move_out_date',
+      label: '退去',
+      defaultWidth: 120,
+      render: (emp) => formatDate(emp.apartment_move_out_date),
+    },
+    {
+      key: 'social_insurance_date',
+      label: '社保加入',
+      defaultWidth: 120,
+      render: (emp) => formatDate(emp.social_insurance_date),
+    },
+    {
+      key: 'entry_request_date',
+      label: '入社依頼',
+      defaultWidth: 120,
+      render: (emp) => formatDate(emp.entry_request_date),
+    },
+    {
+      key: 'notes',
+      label: '備考',
+      defaultWidth: 200,
+      render: (emp) => (
+        <span className="truncate max-w-[180px] inline-block" title={emp.notes || ''}>
+          {emp.notes || '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'current_hire_date',
+      label: '現入社',
+      defaultWidth: 120,
+      render: (emp) => formatDate(emp.current_hire_date),
+    },
+    {
+      key: 'license_type',
+      label: '免許種類',
+      defaultWidth: 120,
+      render: (emp) => emp.license_type || '-',
+    },
+    {
+      key: 'license_expire_date',
+      label: '免許期限',
+      defaultWidth: 120,
+      render: (emp) => formatDate(emp.license_expire_date),
+    },
+    {
+      key: 'commute_method',
+      label: '通勤方法',
+      defaultWidth: 120,
+      render: (emp) => emp.commute_method || '-',
+    },
+    {
+      key: 'optional_insurance_expire',
+      label: '任意保険期限',
+      defaultWidth: 140,
+      render: (emp) => formatDate(emp.optional_insurance_expire),
+    },
+    {
+      key: 'japanese_level',
+      label: '日本語検定',
+      defaultWidth: 120,
+      render: (emp) => emp.japanese_level || '-',
+    },
+    {
+      key: 'career_up_5years',
+      label: 'キャリアアップ5年目',
+      defaultWidth: 140,
+      render: (emp) => emp.career_up_5years ? '✓ 該当' : '-',
     },
     {
       key: 'actions',
-      label: '操作',
-      headerClassName: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
-      cellClassName: 'px-6 py-4 whitespace-nowrap text-sm font-medium',
-      render: (employee) => (
+      label: 'Actions',
+      defaultWidth: 120,
+      render: (emp) => (
         <div className="flex gap-2">
           <button
-            onClick={() => router.push(`/employees/${employee.id}`)}
+            onClick={() => router.push(`/employees/${emp.id}`)}
             className="text-blue-600 hover:text-blue-900"
             title="詳細を見る"
           >
             <EyeIcon className="h-5 w-5 inline" />
           </button>
           <button
-            onClick={() => router.push(`/employees/${employee.id}/edit`)}
+            onClick={() => router.push(`/employees/${emp.id}/edit`)}
             className="text-gray-600 hover:text-gray-900"
             title="編集"
           >
@@ -329,6 +763,10 @@ export default function EmployeesPage() {
       ),
     },
   ];
+
+  const handleColumnResize = (key: ColumnKey, width: number) => {
+    setColumnWidths((prev) => ({ ...prev, [key]: width }));
+  };
 
   const handleColumnToggle = (key: ColumnKey) => {
     setVisibleColumns((prev) => {
@@ -344,7 +782,6 @@ export default function EmployeesPage() {
   };
 
   const visibleColumnDefinitions = columnDefinitions.filter((column) => visibleColumns[column.key]);
-
   const activeCount = employees.filter((e) => e.is_active).length;
   const inactiveCount = employees.filter((e) => !e.is_active).length;
 
@@ -423,9 +860,9 @@ export default function EmployeesPage() {
                   <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="text"
-                    value={searchTerm}
+                    value={searchInput}
                     onChange={(e) => {
-                      setSearchTerm(e.target.value);
+                      setSearchInput(e.target.value);
                       setCurrentPage(1);
                     }}
                     placeholder="氏名または社員番号で検索..."
@@ -471,73 +908,115 @@ export default function EmployeesPage() {
               </div>
             </div>
 
-            {/* Column Selector */}
+            {/* Column Selector Button */}
             <div className="pt-6 border-t border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-gray-700">表示する列</span>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const allVisible = Object.keys(visibleColumns).reduce((acc, key) => {
-                        acc[key as ColumnKey] = true;
-                        return acc;
-                      }, {} as Record<ColumnKey, boolean>);
-                      setVisibleColumns(allVisible);
-                    }}
-                    className="text-xs px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium"
-                  >
-                    全て表示
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setVisibleColumns({
-                        employeeNumber: true,
-                        fullName: true,
-                        kanaName: true,
-                        dateOfBirth: false,
-                        gender: false,
-                        nationality: true,
-                        contractType: true,
-                        factory: true,
-                        hourlyWage: true,
-                        hourlyRateCharged: false,
-                        hireDate: true,
-                        phone: false,
-                        email: false,
-                        address: false,
-                        visaType: false,
-                        zairyuExpireDate: false,
-                        yukyuRemaining: false,
-                        status: true,
-                        terminationDate: false,
-                        actions: true,
-                      });
-                    }}
-                    className="text-xs px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-                  >
-                    デフォルト
-                  </button>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-gray-700">
+                  表示中: {visibleColumnDefinitions.length}列 / 全{columnDefinitions.length}列
+                </span>
+                <button
+                  onClick={() => setShowColumnSelector(!showColumnSelector)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors font-medium"
+                >
+                  <AdjustmentsHorizontalIcon className="h-5 w-5" />
+                  {showColumnSelector ? '列選択を閉じる' : '列を選択'}
+                </button>
+              </div>
+
+              {/* Column Selector Panel */}
+              {showColumnSelector && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm font-semibold text-gray-700">表示する列を選択</span>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const allVisible = Object.keys(visibleColumns).reduce((acc, key) => {
+                            acc[key as ColumnKey] = true;
+                            return acc;
+                          }, {} as Record<ColumnKey, boolean>);
+                          setVisibleColumns(allVisible);
+                        }}
+                        className="text-xs px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium"
+                      >
+                        全て表示
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setVisibleColumns({
+                            photo: true,
+                            current_status: true,
+                            hakenmoto_id: true,
+                            hakensaki_shain_id: true,
+                            factory_name: true,
+                            assignment_location: false,
+                            assignment_line: false,
+                            job_description: false,
+                            full_name_kanji: true,
+                            full_name_kana: false,
+                            gender: false,
+                            nationality: false,
+                            date_of_birth: false,
+                            age: false,
+                            jikyu: true,
+                            jikyu_revision_date: false,
+                            hourly_rate_charged: false,
+                            billing_revision_date: false,
+                            profit_difference: false,
+                            standard_compensation: false,
+                            health_insurance: false,
+                            nursing_insurance: false,
+                            pension_insurance: false,
+                            zairyu_expire_date: true,
+                            visa_renewal_alert: false,
+                            visa_type: false,
+                            postal_code: false,
+                            address: false,
+                            apartment_id: false,
+                            apartment_start_date: false,
+                            hire_date: true,
+                            termination_date: false,
+                            apartment_move_out_date: false,
+                            social_insurance_date: false,
+                            entry_request_date: false,
+                            notes: true,
+                            current_hire_date: false,
+                            license_type: false,
+                            license_expire_date: false,
+                            commute_method: false,
+                            optional_insurance_expire: false,
+                            japanese_level: false,
+                            career_up_5years: false,
+                            actions: true,
+                          });
+                        }}
+                        className="text-xs px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                      >
+                        デフォルト
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    {columnDefinitions.map((column) => (
+                      <label
+                        key={column.key}
+                        className="inline-flex items-center text-sm text-gray-700 cursor-pointer hover:text-gray-900 transition"
+                      >
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                          checked={visibleColumns[column.key]}
+                          onChange={() => handleColumnToggle(column.key)}
+                        />
+                        <span className="ml-2">{column.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <p className="mt-3 text-xs text-gray-500">※最低1列は表示する必要があります。</p>
                 </div>
-              </div>
-              <div className="flex flex-wrap gap-4">
-                {columnDefinitions.map((column) => (
-                  <label key={column.key} className="inline-flex items-center text-sm text-gray-700 cursor-pointer hover:text-gray-900 transition">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                      checked={visibleColumns[column.key]}
-                      onChange={() => handleColumnToggle(column.key)}
-                    />
-                    <span className="ml-2">{column.label}</span>
-                  </label>
-                ))}
-              </div>
-              <p className="mt-3 text-xs text-gray-500">※最低1列は表示する必要があります。</p>
-              <p className="mt-1 text-xs text-blue-600 font-medium">
-                💡 表示中: {visibleColumnDefinitions.length}列 / 全{columnDefinitions.length}列
-              </p>
+              )}
             </div>
           </div>
         </div>
@@ -549,19 +1028,22 @@ export default function EmployeesPage() {
           </div>
         )}
 
-        {/* Employees Table */}
+        {/* Employees Table with Horizontal Scroll */}
         <div className="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200">
-          <div className="overflow-x-auto">
-            <table
-              className="w-full divide-y divide-gray-200"
-              style={{ minWidth: `${Math.max(visibleColumnDefinitions.length * 220, 1800)}px` }}
-            >
-              <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+          <div className="overflow-x-auto" style={{ maxHeight: '70vh' }}>
+            <table className="w-full divide-y divide-gray-200" style={{ minWidth: 'max-content' }}>
+              <thead className="bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0 z-10">
                 <tr>
-                  {visibleColumnDefinitions.map((column) => (
-                    <th key={column.key} className={column.headerClassName}>
+                  {visibleColumnDefinitions.map((column, index) => (
+                    <ResizableColumn
+                      key={column.key}
+                      columnKey={column.key}
+                      width={columnWidths[column.key] || column.defaultWidth}
+                      onResize={handleColumnResize}
+                      isSticky={index === 0} // Make first column (社員№) sticky
+                    >
                       {column.label}
-                    </th>
+                    </ResizableColumn>
                   ))}
                 </tr>
               </thead>
@@ -575,8 +1057,20 @@ export default function EmployeesPage() {
                 ) : (
                   employees.map((employee) => (
                     <tr key={employee.id} className="hover:bg-blue-50/50 transition-colors">
-                      {visibleColumnDefinitions.map((column) => (
-                        <td key={column.key} className={column.cellClassName}>
+                      {visibleColumnDefinitions.map((column, index) => (
+                        <td
+                          key={column.key}
+                          className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 border-r border-gray-100"
+                          style={{
+                            width: `${columnWidths[column.key] || column.defaultWidth}px`,
+                            minWidth: `${columnWidths[column.key] || column.defaultWidth}px`,
+                            maxWidth: `${columnWidths[column.key] || column.defaultWidth}px`,
+                            position: index === 0 ? 'sticky' : 'relative',
+                            left: index === 0 ? 0 : 'auto',
+                            zIndex: index === 0 ? 5 : 1,
+                            backgroundColor: index === 0 ? 'white' : 'transparent',
+                          }}
+                        >
                           {column.render(employee)}
                         </td>
                       ))}

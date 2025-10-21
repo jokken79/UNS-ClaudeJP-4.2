@@ -260,6 +260,144 @@ docker exec -it uns-claudejp-backend python scripts/import_excel.py
 
 ---
 
+## 📅 2025-10-21 - IMPLEMENTACIÓN COMPLETA DE FORMULARIOS Y COLUMNA DE FOTOS
+
+**Duración**: ~2 horas
+**Tareas Completadas**: 9
+
+### ✅ TAREAS COMPLETADAS
+
+#### 1. Página de Detalle de Empleado (`/employees/[id]`) ✅
+- ✅ Agregada **foto grande** (32x32) en header con placeholder circular
+- ✅ Mostrados **TODOS los 60+ campos** organizados en 8 secciones:
+  - 📝 Información Personal (10 campos)
+  - 🏭 Asignación (3 campos)
+  - 💰 Información Financiera & Seguros (10 campos)
+  - 🛂 Información de Visa (2 campos)
+  - 📄 Documentos & Certificados (6 campos)
+  - 🏠 Información de Apartamento (4 campos)
+  - 🏖️ Yukyu (3 campos)
+  - 📊 Status & Notas (2 campos)
+
+#### 2. Formulario de Edición (`components/EmployeeForm.tsx`) ✅
+- ✅ Completamente reescrito (1,194 líneas)
+- ✅ **9 secciones** con todos los 50+ campos
+- ✅ **Upload de foto** con vista previa
+- ✅ Validación de formularios
+- ✅ Todos los campos del Excel presentes
+
+#### 3. Columna de Foto en Tabla de Empleados ✅
+- ✅ **Columna "写真"** agregada como PRIMERA columna
+- ✅ Fotos circulares (12x12) o placeholders con `UserCircleIcon`
+- ✅ Visible por defecto (11 de 44 columnas totales)
+- ✅ Integración perfecta con sistema de columnas redimensionables
+
+### 🔧 PROBLEMAS RESUELTOS
+
+#### 1. Import Faltante ✅
+**Problema**: `UserCircleIcon` usado pero no importado
+**Solución**: Agregado a imports de `@heroicons/react/24/outline`
+**Archivo**: `frontend-nextjs/app/(dashboard)/employees/page.tsx` línea 15
+
+#### 2. Compatibilidad localStorage ✅
+**Problema**: Datos antiguos en localStorage sin clave 'photo'
+**Solución**: Código de migración automática
+```typescript
+const parsed = JSON.parse(saved);
+// ALWAYS ensure 'photo' column exists (backward compatibility)
+if (!('photo' in parsed)) {
+  parsed.photo = true;
+}
+```
+**Archivo**: `frontend-nextjs/app/(dashboard)/employees/page.tsx` líneas 310-312
+
+#### 3. Botón Reset de Columnas ✅
+**Problema**: Botón "Valores por defecto" sin clave 'photo'
+**Solución**: Agregado `photo: true` al objeto de reset
+**Archivo**: `frontend-nextjs/app/(dashboard)/employees/page.tsx` línea 949
+
+#### 4. TypeScript Errors ✅
+**Problema**: Error de compilación por falta de 'photo' en tipo
+**Solución**: Corregidos todos los objetos Record<ColumnKey, boolean>
+
+### 📊 ESTADO FINAL DEL SISTEMA
+
+#### Tabla de Empleados
+- **44 columnas totales** (incluyendo photo)
+- **11 columnas visibles** por defecto:
+  1. 写真 (Foto)
+  2. 現在 (Status actual)
+  3. 社員№ (ID empleado)
+  4. 派遣先ID (ID en fábrica)
+  5. 派遣先 (Fábrica)
+  6. 氏名 (Nombre)
+  7. 時給 (Salario por hora)
+  8. ビザ期限 (Vencimiento visa)
+  9. 入社日 (Fecha de entrada)
+  10. 備考 (Notas)
+  11. Actions (Acciones)
+
+#### Features Implementados
+- ✅ **Búsqueda universal**: 27+ campos searchables
+- ✅ **Debounced search**: Sin flickering (500ms delay)
+- ✅ **Excel-like features**:
+  - Redimensionamiento de columnas (drag)
+  - Show/hide columnas (selector)
+  - Sticky headers (vertical scroll)
+  - Primera columna sticky (horizontal scroll)
+- ✅ **Responsive design**: Funciona en todas las resoluciones
+- ✅ **localStorage persistence**: Anchos y visibilidad de columnas
+
+### 📁 ARCHIVOS MODIFICADOS
+
+#### Backend
+1. `backend/app/schemas/employee.py`
+   - Agregados todos los campos faltantes a EmployeeResponse
+   - 60+ campos totales incluyendo photo_url
+
+2. `backend/app/api/employees.py`
+   - Universal search en 27 campos (líneas 108-160)
+   - Búsqueda numérica incluida
+
+#### Frontend
+1. `frontend-nextjs/app/(dashboard)/employees/page.tsx`
+   - Import de UserCircleIcon (línea 15)
+   - Compatibilidad localStorage para 'photo' (líneas 310-312)
+   - Botón reset con 'photo: true' (línea 949)
+   - Columna photo definida (líneas 453-470)
+   - Total: ~1,100 líneas
+
+2. `frontend-nextjs/app/(dashboard)/employees/[id]/page.tsx`
+   - Header con foto grande (líneas con UserCircleIcon)
+   - 8 secciones con TODOS los campos
+   - Total: ~600 líneas
+
+3. `frontend-nextjs/components/EmployeeForm.tsx`
+   - Reescrito completamente
+   - 9 secciones incluyendo upload de foto
+   - Total: 1,194 líneas
+
+### 🎯 PRÓXIMOS PASOS RECOMENDADOS
+
+1. **Probar upload de fotos reales**
+   - Verificar almacenamiento en servidor
+   - Comprobar display en tabla y detalle
+
+2. **Agregar fotos de empleados**
+   - Bulk upload desde Excel/CSV
+   - Upload individual en formulario
+
+3. **Optimizar rendimiento**
+   - Lazy loading de imágenes
+   - Thumbnail generation
+
+4. **Testing completo**
+   - Formulario de edición con todos los campos
+   - Validaciones de campos
+   - Persistencia de datos
+
+---
+
 **Sesión documentada por**: Claude AI Assistant
-**Para**: UNS-ClaudeJP 4.0
-**Próxima acción**: Aplicar migración Alembic cuando containers estén listos
+**Para**: UNS-ClaudeJP 4.2
+**Próxima acción**: Verificar dependencias Docker y crear commit

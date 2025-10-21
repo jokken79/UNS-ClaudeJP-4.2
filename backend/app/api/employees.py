@@ -102,20 +102,62 @@ async def list_employees(
     if is_active is not None:
         query = query.filter(Employee.is_active == is_active)
     if search:
-        # Try to convert search to int for hakenmoto_id search
+        # Universal search - busca en TODOS los campos de texto y numéricos
+        from sqlalchemy import or_, cast, String
+
+        search_conditions = [
+            # Nombres
+            Employee.full_name_kanji.ilike(f"%{search}%"),
+            Employee.full_name_kana.ilike(f"%{search}%"),
+
+            # IDs y códigos
+            Employee.rirekisho_id.ilike(f"%{search}%"),
+            Employee.factory_id.ilike(f"%{search}%"),
+            Employee.hakensaki_shain_id.ilike(f"%{search}%"),  # ⭐ MUY IMPORTANTE
+            cast(Employee.hakenmoto_id, String).ilike(f"%{search}%"),
+
+            # Información personal
+            Employee.gender.ilike(f"%{search}%"),
+            Employee.nationality.ilike(f"%{search}%"),
+            Employee.address.ilike(f"%{search}%"),
+            Employee.phone.ilike(f"%{search}%"),
+            Employee.email.ilike(f"%{search}%"),
+            Employee.postal_code.ilike(f"%{search}%"),
+
+            # Asignación
+            Employee.assignment_location.ilike(f"%{search}%"),
+            Employee.assignment_line.ilike(f"%{search}%"),
+            Employee.job_description.ilike(f"%{search}%"),
+            Employee.position.ilike(f"%{search}%"),
+            Employee.contract_type.ilike(f"%{search}%"),
+
+            # Visa y documentos
+            Employee.visa_type.ilike(f"%{search}%"),
+            Employee.zairyu_card_number.ilike(f"%{search}%"),
+            Employee.license_type.ilike(f"%{search}%"),
+            Employee.commute_method.ilike(f"%{search}%"),
+            Employee.japanese_level.ilike(f"%{search}%"),
+
+            # Status y notas
+            Employee.current_status.ilike(f"%{search}%"),
+            Employee.notes.ilike(f"%{search}%"),
+            Employee.termination_reason.ilike(f"%{search}%"),
+        ]
+
+        # Try to search by numeric fields if search is a number
         try:
-            search_int = int(search)
-            query = query.filter(
-                (Employee.full_name_kanji.ilike(f"%{search}%")) |
-                (Employee.full_name_kana.ilike(f"%{search}%")) |
-                (Employee.hakenmoto_id == search_int)
-            )
+            search_num = int(search)
+            search_conditions.extend([
+                Employee.hakenmoto_id == search_num,
+                Employee.jikyu == search_num,
+                Employee.hourly_rate_charged == search_num,
+                Employee.profit_difference == search_num,
+                Employee.apartment_id == search_num,
+            ])
         except ValueError:
-            # If not a number, only search by name
-            query = query.filter(
-                (Employee.full_name_kanji.ilike(f"%{search}%")) |
-                (Employee.full_name_kana.ilike(f"%{search}%"))
-            )
+            pass
+
+        query = query.filter(or_(*search_conditions))
 
     total = query.count()
     employees = query.offset((page - 1) * page_size).limit(page_size).all()
