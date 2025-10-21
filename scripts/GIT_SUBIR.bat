@@ -9,6 +9,9 @@ echo       UNS-CLAUDEJP 4.0 - SUBIR A GITHUB
 echo ========================================================
 echo.
 
+REM Cambiar al directorio raiz del proyecto
+cd /d "%~dp0\.."
+
 REM ========================================
 REM PASO 1: Verificaciones de Seguridad
 REM ========================================

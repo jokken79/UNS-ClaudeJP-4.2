@@ -8,6 +8,12 @@
 4. **COMPATIBILIDAD WINDOWS**: Todo debe funcionar en cualquier PC Windows con Docker Desktop
 5. **BACKUP PRIMERO**: Antes de cambios grandes, sugerir backup o crear rama Git
 6. **RESPETAR CONVENCIONES**: Mantener el estilo y estructura actual del proyecto
+7. **🚨 NORMA DE GESTIÓN .md OBLIGATORIA**:
+   - **BUSCAR ANTES DE CREAR**: Siempre buscar si existe un archivo .md similar antes de crear uno nuevo
+   - **REUTILIZAR EXISTENTE**: Si hay un .md con tema similar, agregar contenido allí con fecha
+   - **FORMATO DE FECHA**: Todas las adiciones deben incluir fecha: `## 📅 YYYY-MM-DD - [TÍTULO]`
+   - **EVITAR DUPLICACIÓN**: Prefiero editar existente que crear nuevo. Ej: si hay `ANALISIS_X.md`, no crear `NUEVO_ANALISIS_X.md`
+   - **EXCEPCIONES**: Solo crear nuevo .md si el tema es completamente diferente y no encaja en existentes
 
 ## Arquitectura del Sistema
 

@@ -2,6 +2,25 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🚨 NORMA #7 - GESTIÓN DE ARCHIVOS .md (OBLIGATORIA PARA TODOS LOS AGENTES)
+
+### 📋 REGLAS DE ORO:
+1. **🔍 BUSCAR ANTES DE CREAR**: Siempre buscar si existe un archivo .md similar
+2. **📝 REUTILIZAR EXISTENTE**: Si hay tema similar, agregar allí con fecha
+3. **📅 FORMATO DE FECHA OBLIGATORIO**: `## 📅 YYYY-MM-DD - [TÍTULO]`
+4. **🚫 EVITAR DUPLICACIÓN**: No crear `NUEVO_ANALISIS.md` si existe `ANALISIS.md`
+
+### 📁 EJEMPLOS PRÁCTICOS:
+- ❌ **MALO**: Crear `PROBLEMA_TEMAS_2.md` si existe `PROBLEMA_TEMAS.md`
+- ✅ **BUENO**: Editar `PROBLEMA_TEMAS.md` agregando `## 📅 2025-10-21 - Nuevo problema encontrado`
+
+### 🎯 EXCEPCIONES:
+Solo crear nuevo .md si el tema es **completamente diferente** y no encaja en existentes.
+
+**Ver documentos existentes**: `docs/`, `docs/archive/`, `docs/guides/`, `docs/sessions/`, etc.
+
+---
+
 ## Project Overview
 
 UNS-ClaudeJP 4.0 is a comprehensive HR management system for Japanese staffing agencies (人材派遣会社), built with:

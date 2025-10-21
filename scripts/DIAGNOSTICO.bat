@@ -9,6 +9,9 @@ echo       UNS-CLAUDEJP 4.0 - DIAGNOSTICO DEL SISTEMA
 echo ========================================================
 echo.
 
+REM Cambiar al directorio raiz del proyecto
+cd /d "%~dp0\.."
+
 echo [PASO 1/5] Verificando Docker...
 echo --------------------------------------------------------
 docker --version

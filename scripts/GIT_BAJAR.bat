@@ -9,6 +9,9 @@ echo       UNS-CLAUDEJP 4.0 - BAJAR DE GITHUB
 echo ========================================================
 echo.
 
+REM Cambiar al directorio raiz del proyecto
+cd /d "%~dp0\.."
+
 REM ========================================
 REM PASO 1: Verificar Git
 REM ========================================
@@ -276,9 +279,9 @@ if /i "%REINSTALAR%"=="S" (
     echo Esto puede tardar varios minutos...
     echo.
 
-    call STOP.bat
+    call scripts\STOP.bat
     timeout /t 5 /nobreak >nul
-    call START.bat
+    call scripts\START.bat
 ) else (
     echo.
     echo Recuerda ejecutar START.bat para iniciar los servicios
