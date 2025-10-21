@@ -15,10 +15,12 @@
 
 ```bash
 # Ejecutar el script de inicio
-START.bat
+scripts\START.bat
 ```
 
 El sistema iniciará automáticamente. Espera 20-30 segundos.
+
+> 💡 **Todos los scripts .bat están ahora en la carpeta `scripts/`** - Ver [scripts/README.md](scripts/README.md) para más información.
 
 ### 2. Primer Acceso
 
@@ -76,10 +78,12 @@ Si ves errores **401 (Unauthorized)** en la consola antes de hacer login, **es n
 
 Para información detallada, consulta:
 
-- **ARCHITECTURE.md** - Arquitectura y stack tecnológico
-- **MODULES.md** - Descripción de cada módulo
-- **DEVELOPMENT.md** - Guía para desarrolladores
-- **DEPLOYMENT.md** - Guía de despliegue
+- **[DOCS.md](DOCS.md)** - Índice maestro de toda la documentación
+- **[CLAUDE.md](CLAUDE.md)** - Guía para desarrolladores (arquitectura, comandos, workflow)
+- **[CHANGELOG.md](CHANGELOG.md)** - Historial de cambios y versiones
+- **[docs/guides/](docs/guides/)** - Guías de instalación, Git, seguridad y troubleshooting
+- **[docs/database/](docs/database/)** - Propuestas de BD y análisis de datos
+- **[scripts/](scripts/)** - Scripts de administración del sistema
 
 ---
 
@@ -87,20 +91,25 @@ Para información detallada, consulta:
 
 ```bash
 # Iniciar sistema
-START.bat
+scripts\START.bat
 
 # Detener sistema
-STOP.bat
+scripts\STOP.bat
 
 # Ver logs
-LOGS.bat
+scripts\LOGS.bat
 
 # Limpieza completa (⚠️ Borra TODOS los datos)
-CLEAN.bat
+scripts\CLEAN.bat
 
 # Reinstalar (⚠️ Borra datos)
-REINSTALAR.bat
+scripts\REINSTALAR.bat
+
+# Ver todos los scripts disponibles
+scripts\README.md
 ```
+
+Ver [scripts/README.md](scripts/README.md) para descripción completa de cada comando.
 
 ---
 
@@ -110,18 +119,18 @@ REINSTALAR.bat
 
 **Solución Rápida**:
 1. Espera 30 segundos
-2. Ejecuta `START.bat` de nuevo
+2. Ejecuta `scripts\START.bat` de nuevo
 
 **Si persiste**:
-- Lee `TROUBLESHOOTING.md` para soluciones detalladas
-- Ejecuta `LOGS.bat` para ver detalles del error
-- En último caso: `CLEAN.bat` + `START.bat`
+- Lee [docs/guides/TROUBLESHOOTING.md](docs/guides/TROUBLESHOOTING.md) para soluciones detalladas
+- Ejecuta `scripts\LOGS.bat` para ver detalles del error
+- En último caso: `scripts\CLEAN.bat` + `scripts\START.bat`
 
 ### Otros Problemas
 
 Consulta la documentación completa en:
-- `TROUBLESHOOTING.md` - Guía completa de solución de problemas
-- `FIX_DB_ERROR.md` - Fix del error de base de datos
+- [docs/guides/TROUBLESHOOTING.md](docs/guides/TROUBLESHOOTING.md) - Guía completa de solución de problemas
+- [DOCS.md](DOCS.md) - Índice maestro de toda la documentación
 
 ---
 

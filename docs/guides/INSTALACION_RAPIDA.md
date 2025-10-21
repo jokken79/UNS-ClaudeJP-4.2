@@ -21,7 +21,7 @@ O descarga el ZIP y descomprímelo.
 ### 2. Ejecutar REINSTALAR.bat
 
 ```bash
-REINSTALAR.bat
+scripts\REINSTALAR.bat
 ```
 
 Este script automáticamente:
@@ -52,19 +52,19 @@ Una vez completada la instalación:
 ### Iniciar el Sistema
 
 ```bash
-START.bat
+scripts\START.bat
 ```
 
 ### Detener el Sistema
 
 ```bash
-STOP.bat
+scripts\STOP.bat
 ```
 
 ### Ver Logs
 
 ```bash
-LOGS.bat
+scripts\LOGS.bat
 ```
 
 ## Solución de Problemas
@@ -75,8 +75,8 @@ LOGS.bat
 1. Espera 60-90 segundos (es normal en el primer arranque)
 2. Si persiste, ejecuta:
    ```bash
-   STOP.bat
-   REINSTALAR.bat
+   scripts\STOP.bat
+   scripts\REINSTALAR.bat
    ```
 
 ### Problema: "Error al generar .env"
@@ -101,10 +101,11 @@ LOGS.bat
 
 | Archivo | Descripción |
 |---------|-------------|
-| `START.bat` | Inicia el sistema |
-| `STOP.bat` | Detiene el sistema |
-| `REINSTALAR.bat` | Reinstala desde cero |
-| `LOGS.bat` | Muestra logs en tiempo real |
+| `scripts/START.bat` | Inicia el sistema |
+| `scripts/STOP.bat` | Detiene el sistema |
+| `scripts/REINSTALAR.bat` | Reinstala desde cero |
+| `scripts/LOGS.bat` | Muestra logs en tiempo real |
+| `scripts/README.md` | Descripción de todos los scripts |
 | `generate_env.py` | Genera `.env` automáticamente |
 | `.env` | Configuración (NO commitear a Git) |
 | `.env.example` | Plantilla de configuración |
@@ -130,7 +131,7 @@ Este sistema está diseñado para funcionar en **cualquier PC Windows** con Dock
 
 Al clonar el repositorio en otro equipo:
 
-1. Ejecuta `REINSTALAR.bat`
+1. Ejecuta `scripts\REINSTALAR.bat`
 2. El script generará automáticamente un nuevo `.env` con credenciales únicas
 3. ¡Listo! El sistema estará operativo en 5-8 minutos
 
@@ -138,7 +139,7 @@ Al clonar el repositorio en otro equipo:
 
 Para reportar problemas o solicitar ayuda:
 - Abre un Issue en GitHub
-- Revisa los logs con `LOGS.bat`
+- Revisa los logs con `scripts\LOGS.bat`
 - Consulta la documentación completa en `CLAUDE.md`
 
 ---

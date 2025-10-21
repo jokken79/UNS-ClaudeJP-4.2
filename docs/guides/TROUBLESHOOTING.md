@@ -21,12 +21,12 @@ La base de datos puede necesitar hasta 60 segundos para realizar la recuperació
 
 **Pasos:**
 1. Espera 30-60 segundos después del error
-2. Ejecuta `START.bat` nuevamente
+2. Ejecuta `scripts\START.bat` nuevamente
 3. El sistema debería iniciar correctamente
 
 ```batch
 # Simplemente ejecuta:
-START.bat
+scripts\START.bat
 ```
 
 ### Solución 2: Detener y Reiniciar Correctamente
@@ -34,14 +34,14 @@ START.bat
 Si la Solución 1 no funciona:
 
 **Pasos:**
-1. Ejecuta `STOP.bat` para detener todo correctamente
+1. Ejecuta `scripts\STOP.bat` para detener todo correctamente
 2. Espera 10 segundos
-3. Ejecuta `START.bat` para iniciar de nuevo
+3. Ejecuta `scripts\START.bat` para iniciar de nuevo
 
 ```batch
-STOP.bat
+scripts\STOP.bat
 # Espera 10 segundos
-START.bat
+scripts\START.bat
 ```
 
 ### Solución 3: Limpieza Completa (PRECAUCIÓN)
@@ -51,16 +51,16 @@ START.bat
 Si las soluciones anteriores no funcionan:
 
 **Pasos:**
-1. Ejecuta `CLEAN.bat`
+1. Ejecuta `scripts\CLEAN.bat`
 2. Confirma con "SI" (en mayúsculas)
 3. Espera a que termine la limpieza
-4. Ejecuta `START.bat` para iniciar desde cero
+4. Ejecuta `scripts\START.bat` para iniciar desde cero
 
 ```batch
-CLEAN.bat
+scripts\CLEAN.bat
 # Confirma con: SI
 # Luego ejecuta:
-START.bat
+scripts\START.bat
 ```
 
 ### Solución 4: Verificar Logs
@@ -68,13 +68,13 @@ START.bat
 Para ver los detalles exactos del error:
 
 **Pasos:**
-1. Ejecuta `LOGS.bat`
+1. Ejecuta `scripts\LOGS.bat`
 2. Selecciona "2" (Logs de Database)
 3. Lee los mensajes de error
 4. Busca líneas que contengan "ERROR" o "FATAL"
 
 ```batch
-LOGS.bat
+scripts\LOGS.bat
 # Selecciona opción: 2
 ```
 
@@ -90,7 +90,7 @@ Asegúrate de que Docker Desktop tenga suficientes recursos:
    - **Memory**: 4 GB
    - **Disk**: 20 GB
 4. Aplica los cambios y reinicia Docker Desktop
-5. Ejecuta `START.bat`
+5. Ejecuta `scripts\START.bat`
 
 ---
 
@@ -143,8 +143,9 @@ healthcheck:
 
 ### Nuevos Scripts:
 
-1. **CLEAN.bat**: Script de limpieza completa
-2. **TROUBLESHOOTING.md**: Esta documentación
+1. **scripts/CLEAN.bat**: Script de limpieza completa
+2. **docs/guides/TROUBLESHOOTING.md**: Esta documentación
+3. **scripts/README.md**: Descripción de todos los scripts disponibles
 
 ---
 
@@ -152,10 +153,10 @@ healthcheck:
 
 ### Buenas Prácticas:
 
-1. **Siempre usa STOP.bat** para detener el sistema
+1. **Siempre usa scripts\STOP.bat** para detener el sistema
    - ❌ NO cierres Docker Desktop directamente
    - ❌ NO apagues Windows sin detener los contenedores
-   - ✅ SÍ ejecuta `STOP.bat` antes de apagar
+   - ✅ SÍ ejecuta `scripts\STOP.bat` antes de apagar
 
 2. **Espera a que los servicios inicien completamente**
    - La primera vez puede tardar 2-3 minutos
@@ -175,7 +176,7 @@ healthcheck:
 
 Si ninguna de estas soluciones funciona:
 
-1. Ejecuta `LOGS.bat` y copia los logs de todos los servicios
+1. Ejecuta `scripts\LOGS.bat` y copia los logs de todos los servicios
 2. Toma una captura de pantalla del error
 3. Revisa el archivo `logs/uns-claudejp.log` si existe
 4. Contacta con el equipo de soporte con esta información

@@ -17,21 +17,23 @@ The system manages the complete lifecycle of temporary workers: candidates (履�
 
 ```bash
 # Start all services (DB, Backend, Frontend)
-START.bat
+scripts\START.bat
 # Services available at:
 # - Frontend: http://localhost:3000
 # - API Docs: http://localhost:8000/api/docs
 # - Adminer: http://localhost:8080
 
 # Stop all services
-STOP.bat
+scripts\STOP.bat
 
 # View logs
-LOGS.bat
+scripts\LOGS.bat
 
 # Reset database (WARNING: destroys all data)
-REINSTALAR.bat
+scripts\REINSTALAR.bat
 ```
+
+> 💡 All batch scripts are located in the `scripts/` folder. See [scripts/README.md](scripts/README.md) for detailed descriptions.
 
 Default credentials: `admin` / `admin123`
 
