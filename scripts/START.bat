@@ -9,6 +9,9 @@ echo       UNS-CLAUDEJP 4.0 - INICIAR SISTEMA
 echo ========================================================
 echo.
 
+REM Cambiar al directorio raiz del proyecto
+cd /d "%~dp0\.."
+
 echo [1/6] Verificando archivo .env...
 if not exist .env (
     echo      .env no encontrado. Generando automaticamente...

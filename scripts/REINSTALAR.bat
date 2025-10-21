@@ -29,6 +29,10 @@ if /i NOT "%CONFIRMAR%"=="S" goto :cancelled
 echo.
 echo [0/5] Verificando archivo .env...
 echo.
+
+REM Cambiar al directorio raiz del proyecto
+cd /d "%~dp0\.."
+
 if not exist .env (
     echo      .env no encontrado. Generando automaticamente...
     python generate_env.py

@@ -473,6 +473,27 @@ app/
 - **v4.0 Migration**: Frontend migrated from React/Vite to Next.js 15 in January 2025
 - **Next.js**: Uses App Router (not Pages Router), Server Components by default
 
+## Critical Development Rules
+
+**NEVER DELETE OR MODIFY:**
+1. **Batch scripts** in `scripts/` folder (START.bat, STOP.bat, LOGS.bat, etc.) - System depends on these
+2. **Orchestration files** in `.claude/agents/` - Agent delegation system
+3. **Working code** - If it works, don't touch it; only add or enhance
+4. **Migration history** in `backend/alembic/versions/` - Git conflicts can break the database
+5. **Configuration files** - docker-compose.yml, .env structure, package.json
+
+**WINDOWS COMPATIBILITY:**
+- All scripts must work on any Windows PC with Docker Desktop
+- Use Windows-style paths in batch files (`\` not `/`)
+- PowerShell and cmd.exe compatible
+- No WSL/Linux dependencies required
+
+**BEFORE MAJOR CHANGES:**
+- Suggest creating a Git branch
+- Ask for confirmation before modifying existing code
+- Maintain current coding style and conventions
+- Verify changes don't break Docker orchestration
+
 ## Service URLs
 
 | Service | URL | Description |

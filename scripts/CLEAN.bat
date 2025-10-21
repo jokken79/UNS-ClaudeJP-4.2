@@ -25,6 +25,9 @@ echo.
 echo Iniciando limpieza...
 echo.
 
+REM Cambiar al directorio raiz del proyecto
+cd /d "%~dp0\.."
+
 set "DOCKER_COMPOSE_CMD="
 docker compose version >nul 2>&1
 if %errorlevel% EQU 0 (

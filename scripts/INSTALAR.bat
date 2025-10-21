@@ -50,6 +50,9 @@ echo OK - Docker instalado. Version:
 docker --version
 echo.
 
+REM Cambiar al directorio raiz del proyecto
+cd /d "%~dp0\.."
+
 echo [2/5] Verificando Docker Compose...
 set "DOCKER_COMPOSE_CMD="
 docker compose version >nul 2>&1

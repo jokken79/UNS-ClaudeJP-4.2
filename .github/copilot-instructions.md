@@ -1,5 +1,14 @@
 # UNS-ClaudeJP 4.0 - Guía de Desarrollo para IA
 
+## ⚠️ REGLAS CRÍTICAS - NUNCA VIOLAR
+
+1. **NUNCA BORRAR CÓDIGO FUNCIONAL**: Si algo funciona, NO SE TOCA. Solo se agrega o mejora.
+2. **NUNCA BORRAR ARCHIVOS**: Especialmente batch files (.bat), scripts de Python, configuraciones Docker, o archivos en `/subagentes/`
+3. **NUNCA MODIFICAR SIN CONFIRMAR**: Siempre preguntar antes de cambiar código existente
+4. **COMPATIBILIDAD WINDOWS**: Todo debe funcionar en cualquier PC Windows con Docker Desktop
+5. **BACKUP PRIMERO**: Antes de cambios grandes, sugerir backup o crear rama Git
+6. **RESPETAR CONVENCIONES**: Mantener el estilo y estructura actual del proyecto
+
 ## Arquitectura del Sistema
 
 Este es un **sistema de gestión de RRHH para agencias de personal japonesas** con **arquitectura multi-servicio Docker Compose**:
@@ -93,6 +102,42 @@ db -> importer -> backend -> frontend
 4. **Timeouts OCR**: Azure OCR tiene límites de tasa, implementar lógica de reintentos apropiada
 5. **Conflictos de Migración**: Siempre hacer pull de últimas migraciones antes de crear nuevas
 6. **Persistencia de Temas**: Verificar mapeo de migración de temas al actualizar nombres
+
+## ⚠️ Archivos y Directorios PROTEGIDOS - NO MODIFICAR/BORRAR
+
+### Scripts Batch Críticos (Sistema Funciona con Estos)
+- `START.bat` - Inicio de todos los servicios
+- `STOP.bat` - Detener servicios
+- `CLEAN.bat` - Limpieza de datos
+- `REINSTALAR.bat` - Reinstalación completa
+- `LOGS.bat` - Ver logs del sistema
+- `GIT_SUBIR.bat` / `GIT_BAJAR.bat` - Git workflows
+- `DIAGNOSTICO.bat` - Diagnóstico del sistema
+- `INSTALAR.bat` - Instalación inicial
+
+### Directorios Críticos (NO TOCAR)
+- `/subagentes/` - Sistema de orquestación de agentes (next.js, rrhh.js, sql.js)
+- `/backend/app/models/models.py` - Modelo de datos completo (703 líneas)
+- `/backend/alembic/versions/` - Historial de migraciones
+- `/config/` - Configuraciones y plantillas Excel
+- `/docker/` - Dockerfiles y configuraciones
+- `/base-datos/` - Scripts SQL de inicialización
+
+### Archivos de Configuración Críticos
+- `docker-compose.yml` - Orquestación de servicios
+- `.env` - Variables de entorno (auto-generado por generate_env.py)
+- `orquestador.js` - Router principal de agentes
+- `package.json` - Dependencias Node.js
+- `requirements.txt` - Dependencias Python
+
+## Compatibilidad Windows
+
+Este sistema está diseñado para funcionar en **cualquier PC Windows** con:
+- Docker Desktop instalado y corriendo
+- PowerShell disponible
+- Python 3.11+ (para generate_env.py)
+
+**Todo se ejecuta mediante archivos .bat** - no requiere configuración manual compleja.
 
 ## Archivos Clave para Contexto
 - `docker-compose.yml`: Orquestación de servicios y configuración de entorno

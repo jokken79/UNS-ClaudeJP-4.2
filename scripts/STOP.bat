@@ -9,6 +9,9 @@ echo       UNS-CLAUDEJP 4.0 - DETENER SISTEMA
 echo ========================================================
 echo.
 
+REM Cambiar al directorio raiz del proyecto
+cd /d "%~dp0\.."
+
 echo Verificando Docker Compose...
 set "DOCKER_COMPOSE_CMD="
 docker compose version >nul 2>&1
