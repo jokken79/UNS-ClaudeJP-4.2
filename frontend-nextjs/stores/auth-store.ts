@@ -1,5 +1,8 @@
+'use client';
+
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import type { StateStorage } from 'zustand/middleware';
 
 interface User {
   id: number;
@@ -17,6 +20,20 @@ interface AuthState {
   setUser: (user: User) => void;
 }
 
+const createStorage = (): StateStorage => {
+  if (typeof window === 'undefined') {
+    return {
+      getItem: () => null,
+      setItem: () => undefined,
+      removeItem: () => undefined,
+    };
+  }
+  // Clean up insecure legacy storage keys if they exist
+  localStorage.removeItem('token');
+  localStorage.removeItem('auth-storage');
+  return sessionStorage;
+};
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -25,17 +42,13 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
 
       login: (token, user) => {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('token', token);
-        }
         set({ token, user, isAuthenticated: true });
       },
 
       logout: () => {
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('token');
-          // Clear cookie
           document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+          sessionStorage.removeItem('auth-storage');
         }
         set({ token: null, user: null, isAuthenticated: false });
       },
@@ -44,17 +57,11 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      storage: createJSONStorage(() => {
-        // Only use localStorage on client side
-        if (typeof window !== 'undefined') {
-          return localStorage;
-        }
-        // Return a dummy storage for SSR
-        return {
-          getItem: () => null,
-          setItem: () => {},
-          removeItem: () => {},
-        };
+      storage: createJSONStorage(createStorage),
+      partialize: (state) => ({
+        token: state.token,
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
       }),
     }
   )

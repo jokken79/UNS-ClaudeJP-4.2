@@ -1,30 +1,54 @@
-"""
-Database configuration for UNS-ClaudeJP 4.0
-"""
+"""Database configuration for UNS-ClaudeJP 4.0."""
+
+import logging
+import os
+from typing import Any, Dict
+
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
+from sqlalchemy.engine import URL
+from sqlalchemy.engine.url import make_url
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os
-from dotenv import load_dotenv
+from sqlalchemy.pool import StaticPool
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-# Database URL is REQUIRED - no default for security
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
-    raise ValueError(
-        "DATABASE_URL environment variable must be set. "
-        "Example: postgresql://user:password@host:port/database"
-    )
+    logger.warning("DATABASE_URL is not set. Falling back to an in-memory SQLite database.")
+    DATABASE_URL = "sqlite:///:memory:"
 
-# Create engine with connection pooling
+
+def _build_engine_kwargs(database_url: str) -> Dict[str, Any]:
+    """Build engine configuration depending on the target backend."""
+
+    try:
+        url: URL = make_url(database_url)
+    except Exception as exc:  # pragma: no cover - invalid configuration
+        raise ValueError(f"Invalid DATABASE_URL '{database_url}': {exc}") from exc
+    kwargs: Dict[str, Any] = {"echo": False}
+
+    if url.get_backend_name() == "sqlite":
+        kwargs["connect_args"] = {"check_same_thread": False}
+        if not url.database or url.database == ":memory:":
+            kwargs["poolclass"] = StaticPool
+    else:
+        kwargs.update(
+            pool_size=20,
+            max_overflow=10,
+            pool_pre_ping=True,
+            pool_recycle=3600,
+        )
+
+    return kwargs
+
+
 engine = create_engine(
     DATABASE_URL,
-    pool_size=20,  # Number of connections to keep open
-    max_overflow=10,  # Max connections beyond pool_size
-    pool_pre_ping=True,  # Verify connections before using
-    pool_recycle=3600,  # Recycle connections after 1 hour
-    echo=False  # Set to True for SQL debugging
+    **_build_engine_kwargs(DATABASE_URL),
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

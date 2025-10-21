@@ -37,37 +37,20 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
 
-    console.log('🔐 Iniciando login...');
-
     try {
-      console.log('📡 Llamando a authService.login...');
       const data = await authService.login(username, password);
-      console.log('✅ Login response:', data);
-
-      // Save token FIRST so it's available for the next request
-      console.log('💾 Guardando token en localStorage...');
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('token', data.access_token);
-      }
-      document.cookie = `token=${data.access_token}; path=/; max-age=${30 * 24 * 60 * 60}`; // 30 days
-
-      console.log('📡 Obteniendo usuario actual...');
       const user = await authService.getCurrentUser();
-      console.log('✅ User data:', user);
 
       // Update Zustand store
-      console.log('💾 Actualizando store...');
       login(data.access_token, user);
 
-      console.log('✅ Login completado, redirigiendo...');
       toast.success('ログインに成功しました');
 
       setTimeout(() => {
         router.push('/dashboard');
       }, 100);
     } catch (error: any) {
-      console.error('❌ Error en login:', error);
-      console.error('❌ Error response:', error.response);
+      console.error('Login failed', error?.response?.status);
       toast.error(error.response?.data?.detail || 'ユーザー名またはパスワードが正しくありません');
     } finally {
       setLoading(false);

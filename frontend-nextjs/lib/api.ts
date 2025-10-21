@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { useAuthStore } from '@/stores/auth-store';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 // Create axios instance
@@ -8,52 +10,42 @@ const api = axios.create({
   timeout: 10000,
 });
 
+const getAuthToken = (): string | null => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  return useAuthStore.getState().token;
+};
+
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      console.log('🔐 Request with token:', token ? 'YES' : 'NO');
+    const token = getAuthToken();
+    if (token) {
+      config.headers = config.headers ?? {};
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
-    console.error('❌ Request error:', error);
     return Promise.reject(error);
   }
 );
 
 // Response interceptor to handle auth errors
 api.interceptors.response.use(
-  (response) => {
-    console.log('✅ Response success:', response.status);
-    return response;
-  },
+  (response) => response,
   async (error) => {
     // Only log meaningful errors (not network errors during initial load)
     if (error.response) {
-      console.error('❌ Response error:', error.response.status, error.response.data);
+      console.error('Response error:', error.response.status);
     } else if (error.request) {
-      console.error('❌ Network error:', error.message);
+      console.error('Network error:', error.message);
     }
 
-    if (error.response?.status === 401 && typeof window !== 'undefined') {
-      console.log('🔑 Token expired, clearing auth data...');
-
-      // Clear localStorage (including Zustand store)
-      localStorage.removeItem('token');
-      localStorage.removeItem('auth-storage');
-
-      // Clear cookies
-      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-
-      // Only redirect if not already on login page
-      if (window.location.pathname !== '/login') {
-        console.log('🔄 Redirecting to login...');
+    if (error.response?.status === 401) {
+      useAuthStore.getState().logout();
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
     }
@@ -78,8 +70,8 @@ export const authService = {
   },
 
   logout: () => {
+    useAuthStore.getState().logout();
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
       window.location.href = '/login';
     }
   },

@@ -14,22 +14,34 @@ from azure.cognitiveservices.vision.computervision import ComputerVisionClient
 from azure.cognitiveservices.vision.computervision.models import VisualFeatureTypes
 from msrest.authentication import CognitiveServicesCredentials
 
-from app.core.config_azure import AZURE_ENDPOINT, AZURE_KEY, AZURE_API_VERSION
+from app.core.config_azure import (
+    AZURE_API_VERSION,
+    azure_credentials_available,
+    get_azure_credentials,
+)
 
 logger = logging.getLogger(__name__)
-
-# Initialize Azure Computer Vision client
-credentials = CognitiveServicesCredentials(AZURE_KEY)
-client = ComputerVisionClient(AZURE_ENDPOINT, credentials)
-logger.info(f"Azure Computer Vision client initialized successfully with endpoint: {AZURE_ENDPOINT}")
-
 
 class AzureOCRService:
     """Azure Computer Vision OCR service"""
 
     def __init__(self):
         self.api_version = AZURE_API_VERSION
-        logger.info(f"AzureOCRService initialized with API version: {self.api_version}")
+        self._client: Optional[ComputerVisionClient] = None
+        if not azure_credentials_available():
+            logger.warning("Azure Computer Vision credentials are not configured. OCR requests will fail until they are set.")
+        logger.info("AzureOCRService initialized")
+
+    def _get_client(self) -> ComputerVisionClient:
+        """Lazily initialize the Azure Computer Vision client."""
+
+        if self._client is None:
+            endpoint, key = get_azure_credentials()
+            if not endpoint or not key:
+                raise RuntimeError("Azure Computer Vision credentials are not configured")
+            credentials = CognitiveServicesCredentials(key)
+            self._client = ComputerVisionClient(endpoint, credentials)
+        return self._client
 
     def process_document(self, file_path: str, document_type: str = "zairyu_card") -> Dict[str, Any]:
         """
@@ -55,6 +67,13 @@ class AzureOCRService:
             logger.info(f"Document processed successfully: {document_type}")
             return result
 
+        except RuntimeError as err:
+            logger.error("Azure OCR service is not configured: %s", err)
+            return {
+                "success": False,
+                "error": str(err),
+                "raw_text": "",
+            }
         except Exception as e:
             logger.error(f"Error processing document: {e}", exc_info=True)
             return {
@@ -74,6 +93,7 @@ class AzureOCRService:
             image_stream = BytesIO(image_data)
 
             # Send image for OCR processing
+            client = self._get_client()
             read_response = client.read_in_stream(image_stream, raw=True)
             operation_location = read_response.headers["Operation-Location"]
             operation_id = operation_location.split("/")[-1]

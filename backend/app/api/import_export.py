@@ -1,11 +1,11 @@
-"""
-Import/Export API Endpoints for UNS-ClaudeJP 2.0
-"""
+"""Import/Export API Endpoints for UNS-ClaudeJP 2.0."""
 from fastapi import APIRouter, UploadFile, File, HTTPException, Query
 from fastapi.responses import FileResponse
 import logging
 from pathlib import Path
 import shutil
+import tempfile
+from typing import Final, Optional
 
 from app.services.import_service import import_service
 from app.core.config import settings
@@ -13,8 +13,34 @@ from app.core.config import settings
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-UPLOAD_DIR = Path(settings.UPLOAD_DIR) / "import_temp"
+UPLOAD_DIR: Final[Path] = Path(settings.UPLOAD_DIR) / "import_temp"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _write_upload_to_temp(upload: UploadFile, expected_suffixes: tuple[str, ...]) -> Path:
+    """Persist an uploaded file to a temporary location with a safe filename."""
+
+    original_name = upload.filename or ""
+    suffix = Path(original_name).suffix.lower()
+    if suffix not in expected_suffixes:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Only files with extensions {', '.join(expected_suffixes)} are supported",
+        )
+
+    try:
+        temp_file = tempfile.NamedTemporaryFile(
+            delete=False, suffix=suffix, dir=UPLOAD_DIR
+        )
+        with temp_file as buffer:
+            upload.file.seek(0)
+            shutil.copyfileobj(upload.file, buffer)
+        return Path(temp_file.name)
+    except HTTPException:
+        raise
+    except Exception:  # pragma: no cover - defensive programming
+        logger.exception("Failed to persist uploaded file")
+        raise HTTPException(status_code=500, detail="Unable to process uploaded file")
 
 
 @router.post("/employees")
@@ -24,24 +50,16 @@ async def import_employees(file: UploadFile = File(...)):
     
     Expected columns: 派遣元ID, 氏名, フリガナ, 生年月日, 性別, 国籍, etc.
     """
-    temp_file = None
-    
+    temp_file: Optional[Path] = None
+
     try:
-        # Validate file type
-        if not file.filename.endswith(('.xlsx', '.xls')):
-            raise HTTPException(status_code=400, detail="Only Excel files (.xlsx, .xls) are supported")
-        
-        # Save file temporarily
-        temp_file = UPLOAD_DIR / file.filename
-        
-        with open(temp_file, 'wb') as f:
-            shutil.copyfileobj(file.file, f)
-        
+        temp_file = _write_upload_to_temp(file, (".xlsx", ".xls"))
+
         logger.info(f"Importing employees from {file.filename}")
-        
+
         # Import
         results = import_service.import_employees_from_excel(str(temp_file))
-        
+
         return results
         
     except HTTPException:
@@ -69,17 +87,11 @@ async def import_timer_cards(
     
     Expected columns: 日付, 社員ID, 社員名, 出勤時刻, 退勤時刻
     """
-    temp_file = None
-    
+    temp_file: Optional[Path] = None
+
     try:
-        if not file.filename.endswith(('.xlsx', '.xls')):
-            raise HTTPException(status_code=400, detail="Only Excel files are supported")
-        
-        temp_file = UPLOAD_DIR / file.filename
-        
-        with open(temp_file, 'wb') as f:
-            shutil.copyfileobj(file.file, f)
-        
+        temp_file = _write_upload_to_temp(file, (".xlsx", ".xls"))
+
         logger.info(f"Importing timer cards for {factory_id} - {year}/{month}")
         
         results = import_service.import_timer_cards_from_excel(

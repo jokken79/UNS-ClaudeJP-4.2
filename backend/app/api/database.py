@@ -88,33 +88,46 @@ async def get_table_data(
         # Get columns
         columns = [col["name"] for col in inspector.get_columns(table_name)] if inspector else []
         
-        # Build query
-        query = f"SELECT * FROM {table_name}"
-        count_query = f"SELECT COUNT(*) FROM {table_name}"
-        
-        # Add search condition if provided
+        if limit <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Limit must be greater than zero"
+            )
+        if offset < 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Offset cannot be negative"
+            )
+
+        # Build query with bound parameters to avoid SQL injection
+        search_params = {}
+        where_clause = ""
         if search:
             search_conditions = []
-            for col in columns:
-                search_conditions.append(f"CAST({col} AS TEXT) ILIKE '%{search}%'")
+            for idx, col in enumerate(columns):
+                param_name = f"search_{idx}"
+                search_conditions.append(f"CAST({col} AS TEXT) ILIKE :{param_name}")
+                search_params[param_name] = f"%{search}%"
             if search_conditions:
-                query += f" WHERE {' OR '.join(search_conditions)}"
-                count_query += f" WHERE {' OR '.join(search_conditions)}"
-        
-        # Add pagination
-        query += f" LIMIT {limit} OFFSET {offset}"
-        
+                where_clause = f" WHERE {' OR '.join(search_conditions)}"
+
+        query = text(
+            f"SELECT * FROM {table_name}{where_clause} LIMIT :limit OFFSET :offset"
+        )
+        params = {"limit": limit, "offset": offset, **search_params}
+
+        count_query = text(f"SELECT COUNT(*) FROM {table_name}{where_clause}")
+        count_params = search_params if search_params else None
+
         # Execute queries
-        result = db.execute(text(query))
-        rows = result.fetchall()
-        
-        count_result = db.execute(text(count_query))
+        result = db.execute(query, params)
+        rows = result.mappings().all()
+
+        count_result = db.execute(count_query, count_params or {})
         total_count = count_result.scalar()
-        
+
         # Convert to dict format
-        data_rows = []
-        for row in rows:
-            data_rows.append(dict(zip(columns, row)))
+        data_rows = [dict(row) for row in rows]
         
         return {
             "columns": columns,
