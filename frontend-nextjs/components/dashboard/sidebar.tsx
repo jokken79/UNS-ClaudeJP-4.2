@@ -30,7 +30,7 @@ export function Sidebar() {
             </div>
             <div className="flex flex-col">
               <span className="font-semibold text-sm">UNS HRApp</span>
-              <span className="text-xs text-muted-foreground">v4.0</span>
+              <span className="text-xs text-muted-foreground">v4.2</span>
             </div>
           </Link>
         )}

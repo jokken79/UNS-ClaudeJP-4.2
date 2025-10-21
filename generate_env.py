@@ -35,7 +35,7 @@ def generate_env_file():
     
     # Contenido del .env
     env_content = f"""# ===========================================
-# UNS-ClaudeJP 4.0 - Environment Variables
+# UNS-ClaudeJP 4.2 - Environment Variables
 # ===========================================
 # IMPORTANTE: Este archivo contiene credenciales sensibles
 # NUNCA commitees este archivo al repositorio
@@ -59,8 +59,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES=480
 # ===========================================
 # APPLICATION
 # ===========================================
-APP_NAME=UNS-ClaudeJP 4.0
-APP_VERSION=4.0.0
+APP_NAME=UNS-ClaudeJP 4.2
+APP_VERSION=4.2.0
 ENVIRONMENT=development
 DEBUG=true
 FRONTEND_URL=http://localhost:3000

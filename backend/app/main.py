@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=f"{settings.APP_NAME} API",
-    description="""## UNS-ClaudeJP v4.0 - API de Gestión de Personal Temporal
+    description="""## UNS-ClaudeJP v4.2 - API de Gestión de Personal Temporal
 
 ### Características Principales
 - **OCR Híbrido**: Azure + EasyOCR + Gemini + Tesseract con caché inteligente

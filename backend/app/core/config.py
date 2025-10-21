@@ -11,7 +11,7 @@ import secrets
 class Settings(BaseSettings):
     # App Info
     APP_NAME: str = "UNS-ClaudeJP"
-    APP_VERSION: str = "4.0.0"
+    APP_VERSION: str = "4.2.0"
     COMPANY_NAME: str = "UNS-Kikaku"
     COMPANY_WEBSITE: str = "https://uns-kikaku.com"
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
