@@ -108,11 +108,12 @@ api.interceptors.response.use(
 // Auth services
 export const authService = {
   login: async (username: string, password: string): Promise<AuthResponse> => {
-    const formData = new FormData();
-    formData.append('username', username);
-    formData.append('password', password);
+    const payload = new URLSearchParams();
+    payload.set('username', username);
+    payload.set('password', password);
+    payload.set('grant_type', 'password');
 
-    const response = await api.post<AuthResponse>('/auth/login', formData, {
+    const response = await api.post<AuthResponse>('/auth/login', payload, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
