@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import NavItem from './NavItem';
+import NavItem from "./NavItem";
 import {
   LayoutDashboard,
   Users,
@@ -9,72 +9,96 @@ import {
   Settings,
   HelpCircle,
   Briefcase,
-  File,
-} from 'lucide-react';
+  Building2,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { useVisibilidadTemplateStore } from "@/stores/visibilidad-template-store";
 
 interface NavGroup {
   title: string;
   items: Array<{
     href: string;
     label: string;
-    icon: any;
+    icon: LucideIcon;
   }>;
 }
 
 const navGroups: NavGroup[] = [
   {
-    title: 'PRINCIPAL',
+    title: "PRINCIPAL",
     items: [
-      { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { href: '/candidatos', label: 'Candidatos', icon: Users },
-      { href: '/empleados', label: 'Empleados', icon: Briefcase },
-      { href: '/fabricas', label: 'Fábricas', icon: Briefcase },
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/candidates", label: "Candidatos", icon: Users },
+      { href: "/employees", label: "Empleados", icon: Briefcase },
+      { href: "/factories", label: "Fábricas", icon: Building2 },
     ],
   },
   {
-    title: 'TIEMPO Y NÓMINA',
+    title: "TIEMPO Y NÓMINA",
     items: [
-      { href: '/asistencia', label: 'Asistencia', icon: Clock },
-      { href: '/nomina', label: 'Nómina', icon: FileText },
-      { href: '/solicitudes', label: 'Solicitudes', icon: File },
+      { href: "/timercards", label: "Asistencia", icon: Clock },
+      { href: "/salary", label: "Nómina", icon: FileText },
+      { href: "/requests", label: "Solicitudes", icon: FileText },
     ],
   },
   {
-    title: 'OTROS',
+    title: "OTROS",
     items: [
-      { href: '/base-datos', label: 'Base de Datos DD', icon: File },
-      { href: '/reportes', label: 'Reportes', icon: FileText },
-      { href: '/configuracion', label: 'Configuración', icon: Settings },
-      { href: '/ayuda', label: 'Ayuda', icon: HelpCircle },
+      { href: "/database-management", label: "Base de Datos", icon: FileText },
+      { href: "/reports", label: "Reportes", icon: FileText },
+      { href: "/settings", label: "Configuración", icon: Settings },
+      { href: "/help", label: "Ayuda", icon: HelpCircle },
     ],
   },
 ];
 
 export const Sidebar = () => {
+  const { activeTemplate, getDefaultTemplate } = useVisibilidadTemplateStore();
+  const template = activeTemplate ?? getDefaultTemplate();
+  const navSpacing = template.nav.spacing || "space-y-1";
+  const iconSize = template.nav.iconSize || "w-5 h-5";
+
   return (
-    <div className="w-64 flex flex-col bg-white border-r border-gray-200 h-screen sticky top-0">
+    <div
+      className={cn(
+        template.sidebar.width,
+        "flex flex-col h-screen border-r sticky top-0",
+        template.sidebar.backgroundColor,
+        template.sidebar.textColor,
+      )}
+      style={{ borderColor: template.colors.border }}
+    >
       {/* Logo/Título de la App */}
-      <div className="p-4 text-xl font-bold text-gray-800 border-b border-gray-100">
-        Visibilidad RRHH
+      <div className="p-4 border-b" style={{ borderColor: template.colors.border }}>
+        <p className="text-xl font-bold" style={{ color: template.colors.text }}>
+          Visibilidad RRHH
+        </p>
       </div>
 
       {/* Contenedor del Menú */}
-      <nav className="flex-grow p-2 space-y-4 overflow-y-auto">
+      <nav className="flex-grow p-2 overflow-y-auto space-y-4">
         {navGroups.map((group) => (
-          <div key={group.title}>
+          <div key={group.title} className="flex flex-col gap-2">
             {/* Título de la Sección (PRINCIPAL, OTROS, etc.) */}
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mt-4 mb-2">
+            <h3
+              className="px-3 mt-4 text-xs font-semibold uppercase tracking-wider"
+              style={{ color: template.colors.secondary }}
+            >
               {group.title}
             </h3>
 
             {/* Lista de Enlaces */}
-            <div className="flex flex-col space-y-1">
+            <div className={cn("flex flex-col", navSpacing)}>
               {group.items.map((item) => (
                 <NavItem
                   key={item.href}
                   href={item.href}
                   icon={item.icon}
                   label={item.label}
+                  template={template}
+                  iconSize={iconSize}
                 />
               ))}
             </div>
@@ -83,7 +107,10 @@ export const Sidebar = () => {
       </nav>
 
       {/* Pie de página del Sidebar (Sistema de RRHH) */}
-      <div className="p-4 text-xs text-gray-400 border-t border-gray-100 text-center">
+      <div
+        className="p-4 text-xs text-center border-t"
+        style={{ borderColor: template.colors.border, color: template.colors.secondary }}
+      >
         Sistema de RRHH para agencias japonesas
       </div>
     </div>

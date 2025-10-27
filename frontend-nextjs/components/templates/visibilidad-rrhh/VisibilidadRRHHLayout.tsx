@@ -24,25 +24,31 @@ export const VisibilidadRRHHLayout = ({ children }: { children: React.ReactNode 
   const template = activeTemplate || getDefaultTemplate();
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div
+      className="flex h-screen"
+      style={{ backgroundColor: template.colors.background, color: template.colors.text }}
+    >
       {/* Sidebar Navigation */}
       <Sidebar />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+        <header
+          className="bg-white border-b px-6 py-4 shadow-sm"
+          style={{ borderColor: template.colors.border }}
+        >
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold" style={{ color: template.colors.text }}>
                 {template.name}
               </h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm mt-1" style={{ color: template.colors.secondary }}>
                 {template.description}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-400">
+              <p className="text-xs" style={{ color: template.colors.secondary }}>
                 Template: {template.id}
               </p>
             </div>
@@ -57,7 +63,10 @@ export const VisibilidadRRHHLayout = ({ children }: { children: React.ReactNode 
         </main>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 px-6 py-4 text-xs text-gray-500">
+        <footer
+          className="bg-white border-t px-6 py-4 text-xs"
+          style={{ borderColor: template.colors.border, color: template.colors.secondary }}
+        >
           <p>© 2025 Sistema de RRHH para agencias japonesas. Todos los derechos reservados.</p>
         </footer>
       </div>

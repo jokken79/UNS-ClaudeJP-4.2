@@ -1,7 +1,8 @@
 'use client';
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import type { StateStorage } from 'zustand/middleware';
 
 export interface VisibilidadTemplate {
   id: string;
@@ -40,6 +41,17 @@ interface VisibilidadStore {
   getDefaultTemplate: () => VisibilidadTemplate;
 }
 
+const createStorage = (): StateStorage => {
+  if (typeof window === 'undefined') {
+    return {
+      getItem: () => null,
+      setItem: () => undefined,
+      removeItem: () => undefined,
+    };
+  }
+  return localStorage;
+};
+
 const defaultTemplate: VisibilidadTemplate = {
   id: 'default-visibilidad-rrhh',
   name: 'Visibilidad RRHH Default',
@@ -76,9 +88,19 @@ export const useVisibilidadTemplateStore = create<VisibilidadStore>()(
       getDefaultTemplate: () => defaultTemplate,
 
       addTemplate: (template) =>
-        set((state) => ({
-          templates: [...state.templates, template],
-        })),
+        set((state) => {
+          const exists = state.templates.some((t) => t.id === template.id);
+          const templates = exists
+            ? state.templates.map((t) => (t.id === template.id ? { ...t, ...template } : t))
+            : [...state.templates, template];
+
+          const isActiveTemplate = state.activeTemplate?.id === template.id;
+
+          return {
+            templates,
+            activeTemplate: isActiveTemplate ? template : state.activeTemplate,
+          };
+        }),
 
       updateTemplate: (id, updates) =>
         set((state) => ({
@@ -92,21 +114,77 @@ export const useVisibilidadTemplateStore = create<VisibilidadStore>()(
         })),
 
       deleteTemplate: (id) =>
-        set((state) => ({
-          templates: state.templates.filter((t) => t.id !== id),
-          activeTemplate:
-            state.activeTemplate?.id === id ? null : state.activeTemplate,
-        })),
+        set((state) => {
+          const remaining = state.templates.filter((t) => t.id !== id);
+          const fallback = get().getDefaultTemplate();
+
+          if (!remaining.length) {
+            return {
+              templates: [fallback],
+              activeTemplate: fallback,
+            };
+          }
+
+          const nextActive =
+            state.activeTemplate?.id === id
+              ? remaining.find((t) => t.id === fallback.id) ?? remaining[0]
+              : state.activeTemplate;
+
+          return {
+            templates: remaining,
+            activeTemplate: nextActive ?? fallback,
+          };
+        }),
 
       setActiveTemplate: (id) =>
-        set((state) => ({
-          activeTemplate:
-            state.templates.find((t) => t.id === id) || state.activeTemplate,
-        })),
+        set((state) => {
+          const fallback = get().getDefaultTemplate();
+          const selected = state.templates.find((t) => t.id === id);
+          if (selected) {
+            return { activeTemplate: selected };
+          }
+
+          if (state.activeTemplate) {
+            return { activeTemplate: state.activeTemplate };
+          }
+
+          return {
+            activeTemplate:
+              state.templates.find((t) => t.id === fallback.id) ?? fallback,
+          };
+        }),
     }),
     {
       name: 'visibilidad-template-store',
       version: 1,
+      storage: createJSONStorage(createStorage),
+      partialize: (state) => ({
+        templates: state.templates,
+        activeTemplate: state.activeTemplate,
+      }),
+      merge: (persistedState, currentState) => {
+        if (!persistedState) {
+          return currentState;
+        }
+
+        const fallback = currentState.getDefaultTemplate();
+        const incoming = persistedState as Partial<VisibilidadStore>;
+
+        const templates = incoming.templates?.length
+          ? incoming.templates
+          : [fallback];
+
+        const activeTemplate = incoming.activeTemplate
+          ? templates.find((t) => t.id === incoming.activeTemplate?.id) ?? incoming.activeTemplate
+          : templates.find((t) => t.id === fallback.id) ?? templates[0] ?? fallback;
+
+        return {
+          ...currentState,
+          ...incoming,
+          templates,
+          activeTemplate,
+        };
+      },
     }
   )
 );
