@@ -183,7 +183,7 @@ if /i NOT "%CONFIRMAR%"=="S" goto :cancelled
 
 :continue_reinstall
 echo.
-echo [Paso 1/5] Generando archivo .env si no existe
+echo [Paso 1/6] Generando archivo .env si no existe
 if not exist .env (
     echo      .env no encontrado. Generando
     %PYTHON_CMD% generate_env.py
@@ -198,12 +198,12 @@ if not exist .env (
 )
 echo.
 
-echo [Paso 2/5] Deteniendo y eliminando contenedores y volumenes
+echo [Paso 2/6] Deteniendo y eliminando contenedores y volumenes
 %DOCKER_COMPOSE_CMD% down -v
 echo      [OK] Servicios detenidos y datos eliminados.
 echo.
 
-echo [Paso 2.5/5] Copiando datos de factories desde backup
+echo [Paso 3/6] Copiando datos de factories desde backup
 echo      [>] Creando directorio config\factories
 if not exist "..\config\factories" mkdir "..\config\factories"
 echo      [>] Copiando archivos JSON desde backup
@@ -229,14 +229,35 @@ echo.
 echo [Paso 5/6] Iniciando servicios
 echo      [5.1] Iniciando PostgreSQL
 %DOCKER_COMPOSE_CMD% up -d db --remove-orphans
-echo      [5.2] Esperando 60s a que la base de datos se estabilice
-timeout /t 60 /nobreak >nul
+echo      [5.2] Esperando 120s a que la base de datos se estabilice
+timeout /t 120 /nobreak >nul
 echo      [5.3] Iniciando el resto de servicios
 %DOCKER_COMPOSE_CMD% up -d --remove-orphans
 if !errorlevel! neq 0 (
     echo [ERROR] ERROR: Fallo al iniciar los servicios.
     pause
     exit /b 1
+)
+set "IMPORTER_EXIT_CODE="
+set "IMPORTER_CONTAINER_PRESENT="
+for /f "delims=" %%I in ('docker ps -a --filter "name=uns-claudejp-importer" --format "{{.Names}}" 2^>nul') do set "IMPORTER_CONTAINER_PRESENT=1"
+if defined IMPORTER_CONTAINER_PRESENT (
+    echo      [5.4] Esperando a que el importer complete la inicializacion de datos
+    for /f "delims=" %%I in ('docker wait uns-claudejp-importer 2^>nul') do set "IMPORTER_EXIT_CODE=%%I"
+    if not defined IMPORTER_EXIT_CODE (
+        echo      [AVISO] No se pudo determinar el estado final del importer.
+    ) else if "!IMPORTER_EXIT_CODE!"=="0" (
+        echo      [OK] Importer finalizado correctamente.
+    ) else (
+        echo      [ERROR] El importer finalizo con codigo !IMPORTER_EXIT_CODE!.
+        echo             Mostrando los ultimos logs para diagnostico:
+        docker logs uns-claudejp-importer --tail 40
+        echo             Corrige el error y vuelve a ejecutar este script.
+        pause
+        exit /b 1
+    )
+) else (
+    echo      [AVISO] Contenedor importer no encontrado. Continuando de todos modos.
 )
 echo      [OK] Servicios iniciados.
 echo.
